@@ -1,1 +1,1284 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Northstar Health Solutions - Stop Loss Quote Mock</title>
+  <style>
+    :root {
+      --navy: #062b56;
+      --navy-2: #0a3a72;
+      --blue: #075fb8;
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --line: #d8e1ec;
+      --text: #172033;
+      --muted: #64748b;
+      --green: #1f9d55;
+      --green-bg: #eaf8f0;
+      --amber: #b7791f;
+      --amber-bg: #fff4df;
+      --red: #c53030;
+      --red-bg: #ffe8e8;
+      --shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    button, input, select, textarea { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 246px minmax(0, 1fr);
+    }
+
+    .side {
+      background: linear-gradient(180deg, #062b56 0%, #031a36 100%);
+      color: #fff;
+      padding: 22px 18px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 28px;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      border: 2px solid #9fd3ff;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .logo-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .logo-subtitle {
+      font-size: 11px;
+      color: #bdd7f4;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    .nav {
+      display: grid;
+      gap: 7px;
+    }
+
+    .nav button {
+      border: 1px solid transparent;
+      background: transparent;
+      color: #d8e9fb;
+      border-radius: var(--radius);
+      text-align: left;
+      padding: 10px 11px;
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .nav button:hover,
+    .nav button.active {
+      background: rgba(255,255,255,.12);
+      border-color: rgba(255,255,255,.14);
+      color: #fff;
+    }
+
+    .nav .num {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.15);
+      font-size: 12px;
+      font-weight: 800;
+      flex: 0 0 auto;
+    }
+
+    .logout-btn {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,.22);
+      background: rgba(255,255,255,.08);
+      color: #fff;
+      border-radius: var(--radius);
+      padding: 10px 12px;
+      margin-top: 18px;
+      font-weight: 800;
+    }
+
+    .profile {
+      margin-top: 24px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.16);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      color: #d8e9fb;
+      font-size: 13px;
+    }
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--navy);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .main { min-width: 0; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    .screen-title {
+      height: 54px;
+      background: var(--navy);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 22px;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .screen-title .bubble {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #fff;
+      color: var(--navy);
+      display: grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .screen-title h1 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1;
+    }
+
+    .content {
+      padding: 22px;
+      max-width: 1260px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .pad { padding: 18px; }
+
+    .grid { display: grid; gap: 16px; }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    h2, h3 { margin: 0 0 14px; }
+    h2 { font-size: 22px; }
+    h3 { font-size: 16px; }
+
+    .section-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .muted { color: var(--muted); }
+    .small { font-size: 12px; }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      padding: 10px 11px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(7,95,184,.13);
+    }
+
+    .input-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto;
+      gap: 8px;
+      align-items: end;
+    }
+
+    .id-label {
+      display: none;
+      color: #14804a;
+      font-size: 11px;
+      white-space: nowrap;
+      align-self: center;
+    }
+
+    .btn {
+      border: 1px solid transparent;
+      background: var(--blue);
+      color: #fff;
+      border-radius: 6px;
+      padding: 10px 15px;
+      font-weight: 800;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      text-decoration: none;
+    }
+
+    .btn:hover { background: #054d96; }
+    .btn.secondary {
+      background: #fff;
+      color: var(--navy);
+      border-color: #b9c8da;
+    }
+    .btn.secondary:hover { background: #eef4fb; }
+    .btn.success { background: var(--green); }
+    .btn.success:hover { background: #16713d; }
+    .btn:disabled { opacity: .55; cursor: not-allowed; }
+
+    .actions {
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .right-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .metric {
+      padding: 18px;
+      min-height: 118px;
+      display: grid;
+      align-content: center;
+      gap: 8px;
+      text-align: center;
+    }
+
+    .metric .label {
+      color: var(--muted);
+      font-weight: 750;
+      font-size: 13px;
+    }
+
+    .metric .value {
+      font-size: 30px;
+      font-weight: 900;
+    }
+
+    .metric.good .value { color: var(--green); }
+    .metric.bad .value { color: var(--red); }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      overflow: hidden;
+      border-radius: var(--radius);
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 11px 12px;
+      text-align: left;
+      font-size: 13px;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f7f9fc;
+      color: #405064;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .03em;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: auto;
+      background: #fff;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      border: 1px solid var(--line);
+      color: #475569;
+      background: #fff;
+      white-space: nowrap;
+    }
+
+    .pill.green { color: #176b3a; background: var(--green-bg); border-color: #b7e4c9; }
+    .pill.amber { color: #8a5200; background: var(--amber-bg); border-color: #f4d09a; }
+    .pill.red { color: #a61b1b; background: var(--red-bg); border-color: #f3b1b1; }
+    .pill.blue { color: #075fb8; background: #e7f1ff; border-color: #b7d5fa; }
+
+    .upload-box {
+      border: 1px dashed #9eb2ca;
+      border-radius: var(--radius);
+      padding: 22px;
+      text-align: center;
+      background: #fbfdff;
+    }
+
+    .upload-box input {
+      max-width: 270px;
+      margin: 10px auto 0;
+      display: block;
+    }
+
+    .notice {
+      border-radius: var(--radius);
+      padding: 13px 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #c8dcf4;
+      background: #eaf4ff;
+      color: #17456f;
+      font-size: 13px;
+    }
+
+    .notice.green {
+      background: var(--green-bg);
+      border-color: #b7e4c9;
+      color: #176b3a;
+    }
+
+    .notice.red {
+      background: var(--red-bg);
+      border-color: #f3b1b1;
+      color: #a61b1b;
+    }
+
+    .login-layout {
+      min-height: calc(100vh - 54px);
+      display: grid;
+      grid-template-columns: minmax(260px, 360px) minmax(0, 1fr);
+      gap: 0;
+    }
+
+    .login-brand {
+      background: linear-gradient(180deg, #062b56 0%, #041f41 100%);
+      color: #fff;
+      padding: 36px 28px;
+      display: grid;
+      align-content: space-between;
+      min-height: 620px;
+    }
+
+    .login-panel {
+      padding: 34px;
+      max-width: 520px;
+      align-self: start;
+    }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 13px;
+    }
+
+    .check-row input { width: auto; }
+
+    .summary-line {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      padding: 11px 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .summary-line strong { font-size: 13px; }
+
+    .stepper {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .step {
+      display: grid;
+      justify-items: center;
+      text-align: center;
+      gap: 7px;
+      position: relative;
+    }
+
+    .step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 17px;
+      left: calc(50% + 22px);
+      width: calc(100% - 44px);
+      height: 2px;
+      background: #b7c7d9;
+    }
+
+    .step.done:not(:last-child)::after { background: var(--green); }
+
+    .step-num {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #e2e8f0;
+      color: #334155;
+      font-weight: 900;
+      z-index: 1;
+    }
+
+    .step.done .step-num { background: var(--green); color: #fff; }
+    .step.current .step-num { background: var(--blue); color: #fff; }
+
+    .quote-total {
+      background: var(--green-bg);
+      color: #176b3a;
+      border: 1px solid #b7e4c9;
+      border-radius: var(--radius);
+      padding: 18px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .donut {
+      width: 132px;
+      height: 132px;
+      border-radius: 50%;
+      margin: 6px auto 14px;
+      background: conic-gradient(var(--blue) 0 52%, #df4771 52% 100%);
+      position: relative;
+    }
+
+    .donut::after {
+      content: "";
+      position: absolute;
+      inset: 28px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: inset 0 0 0 1px var(--line);
+    }
+
+    .footer-note {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 1040px) {
+      .app { grid-template-columns: 1fr; }
+      .side { position: static; height: auto; }
+      .nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.two, .grid.three, .grid.four { grid-template-columns: 1fr; }
+      .login-layout { grid-template-columns: 1fr; }
+      .login-brand { min-height: auto; }
+    }
+
+    @media (max-width: 680px) {
+      .nav { grid-template-columns: 1fr; }
+      .content { padding: 14px; }
+      .screen-title { height: auto; padding: 14px; }
+      .actions, .right-actions { flex-direction: column; }
+      .btn { width: 100%; }
+      .stepper { grid-template-columns: 1fr; }
+      .step:not(:last-child)::after { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="side">
+      <div class="logo">
+        <div class="logo-mark">N</div>
+        <div>
+          <div class="logo-title">Northstar</div>
+          <div class="logo-subtitle">Health Solutions</div>
+        </div>
+      </div>
+
+      <nav class="nav" aria-label="Application screens">
+        <button class="active" data-jump="2">Dashboard</button>
+        <button id="navNewQuote" type="button">New Quote Request</button>
+        <button type="button">Submissions</button>
+        <button type="button">Documents</button>
+        <button type="button">Reports</button>
+        <button type="button">Settings</button>
+        <button type="button">Help</button>
+      </nav>
+
+      <div class="profile">
+        <div class="avatar">JS</div>
+        <div><strong>John Smith</strong><br><span>Broker</span></div>
+      </div>
+      <button class="logout-btn" id="btnLogout" type="button">Log out</button>
+      <div class="footer-note">
+        Mock-only behavior: uploads stay in this browser tab. Download buttons create files locally with JavaScript.
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="screen active" data-screen="1">
+        <div class="screen-title"><span class="bubble">1</span><h1>Carrier Login</h1></div>
+        <div class="login-layout">
+          <div class="login-brand">
+            <div class="logo">
+              <div class="logo-mark">N</div>
+              <div>
+                <div class="logo-title">Northstar</div>
+                <div class="logo-subtitle">Health Solutions</div>
+              </div>
+            </div>
+            <div class="profile">
+              <div class="avatar">JS</div>
+              <div><strong>John Smith</strong><br><span>Broker</span></div>
+            </div>
+          </div>
+          <div class="login-panel">
+            <h2>Welcome Back</h2>
+            <p class="muted">Sign in to your underwriting portal</p>
+            <div class="grid">
+              <div class="field">
+                <label>Email Address</label>
+                <div class="input-row">
+                  <input id="txtUsername" value="john.broker@acbbroker.com">
+                  <span class="id-label">id: txtUsername</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>Password</label>
+                <div class="input-row">
+                  <input id="txtPassword" type="password" value="northstar">
+                  <span class="id-label">id: txtPassword</span>
+                </div>
+              </div>
+              <label class="check-row"><input id="chkRememberDevice" type="checkbox" checked> Remember this device <span class="id-label">id: chkRememberDevice</span></label>
+              <button class="btn" id="btnLogin" type="button">Login</button>
+              <div class="card pad">
+                <h3>Multi-Factor Authentication</h3>
+                <p class="small muted">Enter the 6-digit code sent to your mobile number</p>
+                <div class="field">
+                  <label>Enter OTP</label>
+                  <div class="input-row">
+                    <input id="txtOTP" value="458921">
+                    <span class="id-label">id: txtOTP</span>
+                  </div>
+                </div>
+                <button class="btn" id="btnVerify" type="button" style="margin-top:12px;width:100%;">Verify Code</button>
+                <p class="small muted" style="text-align:center;">Did not receive code? Resend</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="2">
+        <div class="screen-title"><span class="bubble">2</span><h1>Submission Dashboard</h1></div>
+        <div class="content">
+          <div class="section-heading">
+            <h2>Submission Dashboard</h2>
+            <div class="right-actions"><button class="btn" id="btnNewQuote" type="button">+ New Quote Request</button><span class="id-label">id: btnNewQuote</span></div>
+          </div>
+          <div class="grid four">
+            <div class="card metric"><div class="label">Total Requests</div><div class="value">24</div></div>
+            <div class="card metric"><div class="label">In Progress</div><div class="value">8</div></div>
+            <div class="card metric good"><div class="label">Quoted</div><div class="value">9</div></div>
+            <div class="card metric bad"><div class="label">Past Due (SLA)</div><div class="value">2</div></div>
+          </div>
+          <div class="card pad" style="margin-top:16px;">
+            <div class="section-heading"><h3>Recent Submissions</h3><a href="#" class="small">View All</a></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Request ID</th><th>Company</th><th>Status</th><th>Date</th><th>SLA Aging</th></tr></thead>
+                <tbody>
+                  <tr><td>REQ-ACME-2026-001</td><td>ACME Corp</td><td><span class="pill amber">Under Review</span></td><td>06/12/2026</td><td><span class="pill amber">3 Days</span></td></tr>
+                  <tr><td>REQ-BETA-2026-002</td><td>Beta Inc</td><td><span class="pill green">Quoted</span></td><td>06/10/2026</td><td>-</td></tr>
+                  <tr><td>REQ-XYZ-2026-003</td><td>XYZ Group</td><td><span class="pill">Draft</span></td><td>06/09/2026</td><td>-</td></tr>
+                  <tr><td>REQ-OMEGA-2026-004</td><td>Omega LLC</td><td><span class="pill blue">Submitted</span></td><td>06/08/2026</td><td><span class="pill green">1 Day</span></td></tr>
+                  <tr><td>REQ-DELTA-2026-005</td><td>Delta Co</td><td><span class="pill amber">Under Review</span></td><td>06/07/2026</td><td><span class="pill red">4 Days</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p class="small muted">Showing 1 to 5 of 24 entries</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="3">
+        <div class="screen-title"><span class="bubble">3</span><h1>Broker & Client Details</h1></div>
+        <div class="content">
+          <div class="card pad">
+            <h3>Broker Information</h3>
+            <div class="grid two">
+              <div class="field"><label>Brokerage Name</label><div class="input-row"><input id="txtBrokerageName" data-required value="Marsh McLennan"><span class="id-label">id: txtBrokerageName</span></div></div>
+              <div class="field"><label>Broker Contact Name</label><div class="input-row"><input id="txtBrokerContactName" data-required value="John Smith"><span class="id-label">id: txtBrokerContactName</span></div></div>
+              <div class="field"><label>Broker Contact Email</label><div class="input-row"><input id="txtBrokerEmail" type="email" data-required value="john.smith@marsh.com"><span class="id-label">id: txtBrokerEmail</span></div></div>
+            </div>
+            <h3 style="margin-top:22px;">Client / Company Information</h3>
+            <div class="grid two">
+              <div class="field"><label>Company Name</label><div class="input-row"><input id="txtCompanyName" data-required value="ACME Corporation"><span class="id-label">id: txtCompanyName</span></div></div>
+              <div class="field"><label>NAICS Industry Code</label><div class="input-row"><input id="txtNAICS" data-required value="621111"><button class="btn" id="btnLookup" type="button">Lookup</button><span class="id-label">id: txtNAICS</span></div></div>
+              <div class="field"><label>Industry Description (auto populated)</label><input id="txtIndustryDesc" value="Offices of Physicians"></div>
+              <div class="field"><label>Current Funding Type</label><div class="input-row"><select id="ddlFundingType" data-required><option value="">Select funding type</option><option>Self-Funded</option><option>Fully Insured</option><option>Level Funded</option></select><span class="id-label">id: ddlFundingType</span></div></div>
+              <div class="field"><label>Primary Location ZIP</label><div class="input-row"><input id="txtZip" data-required value="75024"><span class="id-label">id: txtZip</span></div></div>
+            </div>
+            <div class="actions"><button class="btn secondary" data-next="2">Back</button><button class="btn" data-next="4" id="btnNext">Next</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="4">
+        <div class="screen-title"><span class="bubble">4</span><h1>Coverage & Quote Parameters</h1></div>
+        <div class="content">
+          <div class="card pad">
+            <div class="grid two">
+              <div class="field"><label>Requested Effective Date</label><div class="input-row"><input id="dtpEffectiveDate" type="date" data-required value="2027-01-01"><span class="id-label">id: dtpEffectiveDate</span></div></div>
+              <div class="field"><label>Requested Services</label><div class="input-row"><select id="ddlServices" data-required><option value="">Select services</option><option>ASO</option><option>Full Administration</option><option>Claims Only</option></select><span class="id-label">id: ddlServices</span></div></div>
+              <div class="field"><label>Specific Stop-Loss Deductible</label><div class="input-row"><input id="txtSpecificDeductible" data-required value="$ 50,000"><span class="id-label">id: txtSpecificDeductible</span></div></div>
+              <div class="field"><label>Aggregate Corridor (Factor)</label><div class="input-row"><input id="txtAggFactor" data-required value="125"><span class="id-label">id: txtAggFactor</span></div></div>
+              <div class="field"><label>Contract Basis</label><div class="input-row"><select id="ddlContractBasis" data-required><option value="">Select contract basis</option><option>12/12</option><option>12/15</option><option>15/12</option></select><span class="id-label">id: ddlContractBasis</span></div></div>
+              <div class="field"><label>PPO / Network</label><div class="input-row"><select id="ddlNetwork" data-required><option value="">Select network</option><option>Cigna PPO</option><option>Aetna</option><option>UnitedHealthcare</option><option>BlueCross</option></select><span class="id-label">id: ddlNetwork</span></div></div>
+            </div>
+            <div class="notice" style="margin-top:20px;">Network availability shown for ZIP 75024 (TX)</div>
+            <div class="actions"><button class="btn secondary" data-next="3">Back</button><button class="btn" data-next="5">Next</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="5">
+        <div class="screen-title"><span class="bubble">5</span><h1>Census & Demographics</h1></div>
+        <div class="content">
+          <div class="card pad">
+            <h3>Upload Census File</h3>
+            <div class="upload-box">
+              <strong>Drag & drop file here</strong><br><span class="small muted">or</span>
+              <input id="fileCensus" type="file" accept=".xlsx,.xls,.csv">
+              <span class="id-label">id: fileCensus</span>
+            </div>
+            <p id="censusFileName" class="small muted">No census file uploaded yet.</p>
+            <div id="censusEmpty" class="notice" style="margin-top:18px;">Upload a census file to extract demographics, tier distribution, and member counts.</div>
+            <div id="censusResults" class="hidden">
+              <h3 style="margin-top:18px;">Census Summary (Extracted)</h3>
+              <div class="grid three">
+                <div class="card metric"><div class="label">Total Employees</div><div class="value" id="totalEmployees">500</div></div>
+                <div class="card metric"><div class="label">Total Members</div><div class="value" id="totalMembers">1,250</div></div>
+                <div class="card metric"><div class="label">Average Age</div><div class="value" id="avgAge">38</div></div>
+              </div>
+              <div class="grid two" style="margin-top:16px;">
+                <div class="card pad">
+                  <h3>Gender Distribution</h3>
+                  <div class="donut" aria-label="Male 52 percent, Female 48 percent"></div>
+                  <p><span class="pill blue">Male 52% (650)</span> <span class="pill red">Female 48% (600)</span></p>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>Tier</th><th>Members</th></tr></thead>
+                    <tbody>
+                      <tr><td>Employee Only</td><td>250</td></tr>
+                      <tr><td>Employee + Spouse</td><td>120</td></tr>
+                      <tr><td>Family</td><td>130</td></tr>
+                      <tr><td><strong>Total</strong></td><td><strong>500</strong></td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="actions"><button class="btn secondary" data-next="4">Back</button><button class="btn" data-next="6" id="btnNextCensus">Next</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="6">
+        <div class="screen-title"><span class="bubble">6</span><h1>Claims Experience</h1></div>
+        <div class="content">
+          <div class="card pad">
+            <div class="grid two">
+              <div class="field"><label>Reporting Period (Months)</label><div class="input-row"><select id="ddlReportPeriod" data-required><option value="">Select period</option><option>24</option><option>12</option><option>36</option></select><span class="id-label">id: ddlReportPeriod</span></div></div>
+              <div class="field"><label>Total Medical Paid</label><div class="input-row"><input id="txtMedicalPaid" data-required value="$ 4,500,000"><span class="id-label">id: txtMedicalPaid</span></div></div>
+              <div class="field"><label>Total Rx Paid</label><div class="input-row"><input id="txtRxPaid" data-required value="$ 1,200,000"><span class="id-label">id: txtRxPaid</span></div></div>
+              <div class="field"><label>Total Combined Paid (Auto Calculated)</label><div class="input-row"><input id="txtCombinedPaid" value="$ 5,700,000" readonly><span class="id-label">id: txtCombinedPaid</span></div></div>
+            </div>
+            <div class="notice green" style="margin-top:20px;">Calculation Verified: Combined Paid = Medical Paid + Rx Paid</div>
+            <div class="actions"><button class="btn secondary" data-next="5">Back</button><button class="btn" data-next="7" id="btnNextClaims">Next</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="7">
+        <div class="screen-title"><span class="bubble">7</span><h1>Large Claimant / Risk Disclosure</h1></div>
+        <div class="content">
+          <div class="grid two">
+            <div class="card pad">
+              <div class="grid two">
+                <div class="field"><label>Claimants Over Stop-Loss</label><div class="input-row"><input id="txtClaimantsOver" type="number" data-required value="6"><span class="id-label">id: txtClaimantsOver</span></div></div>
+                <div class="field"><label>Total Shock Claim Liability YTD</label><div class="input-row"><input id="txtShockLiability" data-required value="$ 1,200,000"><span class="id-label">id: txtShockLiability</span></div></div>
+              </div>
+            </div>
+            <div class="card pad">
+              <h3>Referral Flag</h3>
+              <div id="referralFlag" class="notice red"><strong>HIGH RISK</strong> Threshold: &gt; 3 Claimants</div>
+              <span class="id-label">id: lblReferralFlag</span>
+            </div>
+          </div>
+          <div class="card pad" style="margin-top:16px;">
+            <h3>Active Severe Diagnoses</h3>
+            <div id="diagnosisEntry" class="card pad hidden" style="margin-bottom:14px; box-shadow:none;">
+              <div class="grid three">
+                <div class="field"><label>ICD-10 Code</label><input id="txtDiagnosisCode" placeholder="Example: C34.90"></div>
+                <div class="field"><label>Description</label><input id="txtDiagnosisDesc" placeholder="Diagnosis description"></div>
+                <div class="field"><label>Category</label><input id="txtDiagnosisCategory" placeholder="Example: Oncology"></div>
+              </div>
+              <div class="right-actions" style="margin-top:12px;">
+                <button class="btn secondary" id="btnCancelDiagnosis" type="button">Cancel</button>
+                <button class="btn" id="btnSaveDiagnosis" type="button">Add to Table</button>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>ICD-10 Code</th><th>Description</th><th>Category</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="diagnosisBody">
+                  <tr><td>C34.90</td><td>Malignant neoplasm of bronchus or lung, unsp.</td><td>Oncology</td><td><span class="pill green">Active</span></td><td><button class="btn secondary mini-delete" type="button">Remove</button></td></tr>
+                  <tr><td>N18.5</td><td>Chronic kidney disease, stage 5</td><td>Renal</td><td><span class="pill green">Active</span></td><td><button class="btn secondary mini-delete" type="button">Remove</button></td></tr>
+                  <tr><td>G35</td><td>Multiple sclerosis</td><td>Neurological</td><td><span class="pill green">Active</span></td><td><button class="btn secondary mini-delete" type="button">Remove</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="actions"><button class="btn secondary" id="btnAddDiagnosis" type="button">+ Add Diagnosis</button><span class="id-label">id: btnAddDiagnosis</span><button class="btn" data-next="8">Next</button></div>
+            <div class="actions" style="margin-top:8px;"><button class="btn secondary" data-next="6">Back</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="8">
+        <div class="screen-title"><span class="bubble">8</span><h1>Review & Submit</h1></div>
+        <div class="content">
+          <div class="card pad">
+            <h3>Review Your Submission</h3>
+            <p class="small muted">Please review all sections before submitting.</p>
+            <div id="reviewList"></div>
+            <div class="summary-line"><strong>Submission Hash (SHA-256)</strong><span id="txtHash">8A2C4F706E1900F6CAD520DAF766C5D9A8EF1F383CAD56E7A88ECD01E2F3A465</span><span class="id-label">id: lblHash</span></div>
+            <div class="summary-line"><strong>Submission Timestamp</strong><span id="lblTimestamp">17-Jun-2026 14:32:12 CT</span><span class="id-label">id: lblTimestamp</span></div>
+            <label class="check-row"><input id="chkAttestation" type="checkbox" checked> I certify that the above information is true and accurate. <span class="id-label">id: chkAttestation</span></label>
+            <div class="actions"><button class="btn secondary" data-next="7">Back</button><button class="btn success" id="btnSubmit" type="button">Submit</button><span class="id-label">id: btnSubmit</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="9">
+        <div class="screen-title"><span class="bubble">9</span><h1>Processing / Status</h1></div>
+        <div class="content">
+          <div class="section-heading">
+            <h2>Request ID: <span id="lblRequestId">REQ-ACME-2026-001</span></h2>
+            <span>Submitted On: <strong id="lblSubmittedOn">17-Jun-2026 14:32 CT</strong> <span class="id-label">id: lblSubmittedOn</span></span>
+          </div>
+          <div class="card pad">
+            <div class="stepper">
+              <div class="step done"><div class="step-num">1</div><strong>Submitted</strong><span class="small muted">Complete</span></div>
+              <div class="step done"><div class="step-num">2</div><strong>Risk Review</strong><span class="small muted">Complete</span></div>
+              <div class="step done"><div class="step-num">3</div><strong>Rating</strong><span class="small muted">Complete</span></div>
+              <div class="step current"><div class="step-num">4</div><strong>Quote Ready</strong><span class="small muted">Immediate</span></div>
+            </div>
+            <div class="grid two">
+              <div class="card pad"><h3>Current Status</h3><p><strong id="lblCurrentStatus">Quote Ready - Generated Immediately</strong> <span class="id-label">id: lblCurrentStatus</span></p></div>
+              <div class="card pad"><h3>Referral Flag</h3><p><span class="pill red">YES</span> <span class="id-label">id: lblReferralYes</span></p><p class="small muted">Reason: Claimants Over Stop-Loss &gt; Threshold</p></div>
+              <div class="card pad"><h3>SLA / Turnaround</h3><p>Standard SLA: 5 Business Days<br>Elapsed: 0 Days</p></div>
+              <div class="card pad"><h3>SLA Remaining</h3><p><strong id="lblSLARemaining">5 Days</strong> <span class="id-label">id: lblSLARemaining</span></p></div>
+            </div>
+            <div class="notice" style="margin-top:16px;">The quote is ready now because this mock generates pricing immediately after required inputs are submitted.</div>
+            <div class="actions"><button class="btn secondary" data-next="8">Back</button><button class="btn" data-next="10">View Quote</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen" data-screen="10">
+        <div class="screen-title"><span class="bubble">10</span><h1>Quote Output</h1></div>
+        <div class="content">
+          <div class="section-heading">
+            <h2>Quote Summary</h2>
+            <div class="right-actions">
+              <button class="btn secondary" id="btnPrint" type="button">Print</button>
+              <button class="btn" id="btnDownloadPDF" type="button">Download Quote PDF</button>
+              <span class="id-label">id: btnDownloadPDF</span>
+            </div>
+          </div>
+          <div class="grid two">
+            <div class="card pad">
+              <div class="table-wrap">
+                <table>
+                  <tbody>
+                    <tr><th>Company</th><td id="quoteCompany">ACME Corporation</td></tr>
+                    <tr><th>Specific Deductible</th><td id="quoteDeductible">$50,000</td></tr>
+                    <tr><th>Aggregate Factor</th><td id="quoteAgg">125%</td></tr>
+                    <tr><th>Contract Basis</th><td id="quoteContract">12/12</td></tr>
+                    <tr><th>Rate Guarantee</th><td>12 Months</td></tr>
+                    <tr><th>Quoted On</th><td id="quoteDate">17-Jun-2026</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="card pad">
+              <h3>Monthly Premium Rates</h3>
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Tier</th><th>Rate PEPM</th></tr></thead>
+                  <tbody>
+                    <tr><td>Employee Only</td><td id="rateEmployee">$180.00</td></tr>
+                    <tr><td>Employee + Spouse</td><td id="rateSpouse">$390.00</td></tr>
+                    <tr><td>Family</td><td id="rateFamily">$670.00</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="quote-total" style="margin-top:14px;">Aggregate Premium<br><span id="aggregatePremium">$56,500 / Month</span></div>
+            </div>
+          </div>
+          <div class="grid two" style="margin-top:16px;">
+            <div class="card pad">
+              <h3>Laser / Conditions</h3>
+              <ul>
+                <li>Claimant #2 (C34.90) - Oncology Laser</li>
+                <li>Specific Deductible applies per policy terms.</li>
+              </ul>
+            </div>
+            <div class="card pad">
+              <h3>Terms & Conditions</h3>
+              <p class="small muted">Northstar Health Solutions Stop-Loss insurance is subject to the terms, conditions, limitations and exclusions of the policy. Rates are based on the information provided and may change if material changes occur.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const app = {
+      screen: 1,
+      quoteGenerated: false,
+      censusFiles: [],
+      quote: {
+        employee: 180,
+        spouse: 390,
+        family: 670,
+        aggregate: 56500
+      }
+    };
+
+    const screens = Array.from(document.querySelectorAll('.screen'));
+    const navButtons = Array.from(document.querySelectorAll('[data-jump]'));
+
+    function moneyNumber(value) {
+      const parsed = String(value || '').replace(/[^0-9.]/g, '');
+      return Number(parsed || 0);
+    }
+
+    function formatUsd(value, decimals = 0) {
+      return '$' + Number(value || 0).toLocaleString('en-US', {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      });
+    }
+
+    function go(screenNumber) {
+      app.screen = Number(screenNumber);
+      screens.forEach(screen => screen.classList.toggle('active', Number(screen.dataset.screen) === app.screen));
+      navButtons.forEach(button => button.classList.toggle('active', Number(button.dataset.jump) === app.screen));
+      document.getElementById('navNewQuote').classList.toggle('active', app.screen >= 3 && app.screen <= 10);
+      if (app.screen === 8) renderReview();
+      if (app.screen === 9) renderStatus();
+      if (app.screen === 10) {
+        if (!app.quoteGenerated) generateQuote();
+        renderQuote();
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function validateRequired(scope = document) {
+      const fields = Array.from(scope.querySelectorAll('[data-required]'));
+      const invalid = fields.filter(field => !String(field.value || '').trim() || !field.checkValidity());
+      invalid.forEach(field => field.style.borderColor = '#c53030');
+      fields.filter(field => !invalid.includes(field)).forEach(field => field.style.borderColor = '');
+      return invalid.length === 0;
+    }
+
+    function resetNewQuote() {
+      [
+        'txtBrokerageName',
+        'txtBrokerContactName',
+        'txtBrokerEmail',
+        'txtCompanyName',
+        'txtNAICS',
+        'txtIndustryDesc',
+        'txtZip',
+        'dtpEffectiveDate',
+        'txtSpecificDeductible',
+        'txtAggFactor',
+        'txtMedicalPaid',
+        'txtRxPaid',
+        'txtCombinedPaid',
+        'txtClaimantsOver',
+        'txtShockLiability'
+      ].forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+          field.value = '';
+          field.style.borderColor = '';
+        }
+      });
+
+      ['ddlFundingType', 'ddlServices', 'ddlContractBasis', 'ddlNetwork', 'ddlReportPeriod'].forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+          field.value = '';
+          field.style.borderColor = '';
+        }
+      });
+
+      const censusInput = document.getElementById('fileCensus');
+      if (censusInput) censusInput.value = '';
+      app.censusFiles = [];
+      app.quoteGenerated = false;
+      app.quote = { employee: 0, spouse: 0, family: 0, aggregate: 0 };
+      document.getElementById('censusFileName').textContent = 'No census file uploaded yet.';
+      document.getElementById('censusEmpty').classList.remove('hidden');
+      document.getElementById('censusResults').classList.add('hidden');
+      document.getElementById('diagnosisBody').innerHTML = '';
+      document.getElementById('chkAttestation').checked = false;
+      clearDiagnosisEntry();
+      updateReferralFlag();
+    }
+
+    function generateQuote() {
+      const deductible = Math.max(25000, moneyNumber(document.getElementById('txtSpecificDeductible').value));
+      const claimants = Number(document.getElementById('txtClaimantsOver').value || 0);
+      const combinedPaid = moneyNumber(document.getElementById('txtCombinedPaid').value);
+      const riskFactor = 1 + Math.min(0.35, claimants * 0.025);
+      const claimsFactor = 1 + Math.min(0.25, combinedPaid / 40000000);
+      const deductibleCredit = deductible >= 75000 ? 0.92 : deductible >= 50000 ? 1 : 1.08;
+      const employee = Math.round(172 * riskFactor * claimsFactor * deductibleCredit);
+      const spouse = Math.round(employee * 2.16);
+      const family = Math.round(employee * 3.72);
+      const aggregate = Math.round((250 * employee + 120 * spouse + 130 * family) / 100) * 100;
+      app.quote = { employee, spouse, family, aggregate };
+      app.quoteGenerated = true;
+    }
+
+    function updateCombinedPaid() {
+      const total = moneyNumber(document.getElementById('txtMedicalPaid').value) + moneyNumber(document.getElementById('txtRxPaid').value);
+      document.getElementById('txtCombinedPaid').value = formatUsd(total);
+    }
+
+    function updateReferralFlag() {
+      const claimantsRaw = document.getElementById('txtClaimantsOver').value;
+      const shockRaw = document.getElementById('txtShockLiability').value;
+      const flag = document.getElementById('referralFlag');
+      if (!String(claimantsRaw || '').trim() && !String(shockRaw || '').trim()) {
+        flag.className = 'notice';
+        flag.innerHTML = 'Enter claimant and shock liability details to calculate the referral flag.';
+        return;
+      }
+      const claimants = Number(claimantsRaw || 0);
+      const shock = moneyNumber(shockRaw);
+      const highRisk = claimants > 3 || shock >= 1000000;
+      flag.className = highRisk ? 'notice red' : 'notice green';
+      flag.innerHTML = highRisk ? '<strong>HIGH RISK</strong> Threshold: > 3 Claimants' : '<strong>STANDARD RISK</strong> No referral threshold breached';
+    }
+
+    function clearDiagnosisEntry() {
+      document.getElementById('txtDiagnosisCode').value = '';
+      document.getElementById('txtDiagnosisDesc').value = '';
+      document.getElementById('txtDiagnosisCategory').value = '';
+      document.getElementById('diagnosisEntry').classList.add('hidden');
+    }
+
+    function appendDiagnosis(code, description, category) {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${escapeHtml(code)}</td>
+        <td>${escapeHtml(description)}</td>
+        <td>${escapeHtml(category)}</td>
+        <td><span class="pill green">Active</span></td>
+        <td><button class="btn secondary mini-delete" type="button">Remove</button></td>
+      `;
+      document.getElementById('diagnosisBody').appendChild(row);
+    }
+
+    function renderReview() {
+      const items = [
+        'Broker & Client Details',
+        'Coverage & Quote Parameters',
+        'Census & Demographics',
+        'Claims Experience',
+        'Large Claimant / Risk Disclosure'
+      ];
+      document.getElementById('reviewList').innerHTML = items.map(item => `
+        <div class="summary-line"><strong>${item}</strong><span class="pill green">Complete OK</span></div>
+      `).join('');
+      document.getElementById('lblTimestamp').textContent = new Date().toLocaleString();
+    }
+
+    function renderStatus() {
+      document.getElementById('lblSubmittedOn').textContent = new Date().toLocaleString();
+      document.getElementById('lblCurrentStatus').textContent = 'Quote Ready - Generated Immediately';
+      document.getElementById('lblSLARemaining').textContent = '5 Days';
+    }
+
+    function renderQuote() {
+      document.getElementById('quoteCompany').textContent = document.getElementById('txtCompanyName').value || 'ACME Corporation';
+      document.getElementById('quoteDeductible').textContent = formatUsd(moneyNumber(document.getElementById('txtSpecificDeductible').value));
+      document.getElementById('quoteAgg').textContent = String(document.getElementById('txtAggFactor').value || '125') + '%';
+      document.getElementById('quoteContract').textContent = document.getElementById('ddlContractBasis').value || '12/12';
+      document.getElementById('quoteDate').textContent = new Date().toLocaleDateString();
+      document.getElementById('rateEmployee').textContent = formatUsd(app.quote.employee, 2);
+      document.getElementById('rateSpouse').textContent = formatUsd(app.quote.spouse, 2);
+      document.getElementById('rateFamily').textContent = formatUsd(app.quote.family, 2);
+      document.getElementById('aggregatePremium').textContent = formatUsd(app.quote.aggregate) + ' / Month';
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function downloadBlob(fileName, content, type) {
+      const blob = new Blob([content], { type });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    function makePdfContent(lines) {
+      const safe = text => String(text).replace(/\\/g, '\\\\').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+      const text = lines.map((line, index) => `BT /F1 12 Tf 50 ${760 - index * 18} Td (${safe(line)}) Tj ET`).join('\n');
+      const objects = [
+        '1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj',
+        '2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj',
+        '3 0 obj << /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >> endobj',
+        '4 0 obj << /Type /Font /Subtype /Type1 /BaseFont /Helvetica >> endobj',
+        `5 0 obj << /Length ${text.length} >> stream\n${text}\nendstream endobj`
+      ];
+      let pdf = '%PDF-1.4\n';
+      const offsets = [0];
+      objects.forEach(obj => {
+        offsets.push(pdf.length);
+        pdf += obj + '\n';
+      });
+      const xref = pdf.length;
+      pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+      offsets.slice(1).forEach(offset => {
+        pdf += String(offset).padStart(10, '0') + ' 00000 n \n';
+      });
+      pdf += `trailer << /Root 1 0 R /Size ${objects.length + 1} >>\nstartxref\n${xref}\n%%EOF`;
+      return pdf;
+    }
+
+    function downloadQuotePdf() {
+      if (!app.quoteGenerated) generateQuote();
+      renderQuote();
+      const lines = [
+        'Northstar Health Solutions - Stop Loss Quote',
+        'Request ID: REQ-ACME-2026-001',
+        'Company: ' + document.getElementById('quoteCompany').textContent,
+        'Specific Deductible: ' + document.getElementById('quoteDeductible').textContent,
+        'Aggregate Factor: ' + document.getElementById('quoteAgg').textContent,
+        'Contract Basis: ' + document.getElementById('quoteContract').textContent,
+        'Employee Only Rate: ' + document.getElementById('rateEmployee').textContent,
+        'Employee + Spouse Rate: ' + document.getElementById('rateSpouse').textContent,
+        'Family Rate: ' + document.getElementById('rateFamily').textContent,
+        'Aggregate Premium: ' + document.getElementById('aggregatePremium').textContent,
+        'Referral Flag: YES - Claimants over stop-loss threshold',
+        'Generated immediately after submission for hackathon demo.'
+      ];
+      downloadBlob('REQ-ACME-2026-001-quote.pdf', makePdfContent(lines), 'application/pdf');
+    }
+
+    document.querySelectorAll('[data-jump]').forEach(button => {
+      button.addEventListener('click', () => go(button.dataset.jump));
+    });
+
+    document.querySelectorAll('[data-next]').forEach(button => {
+      button.addEventListener('click', () => {
+        const target = Number(button.dataset.next);
+        const currentScreen = document.querySelector(`.screen[data-screen="${app.screen}"]`);
+        if (target > app.screen && currentScreen && !validateRequired(currentScreen)) {
+          alert('Please complete the required fields before continuing.');
+          return;
+        }
+        if (target > 5 && app.censusFiles.length === 0) {
+          alert('Please upload a census file before continuing.');
+          go(5);
+          return;
+        }
+        go(target);
+      });
+    });
+
+    document.getElementById('btnLogin').addEventListener('click', () => go(2));
+    document.getElementById('btnVerify').addEventListener('click', () => go(2));
+    document.getElementById('btnLogout').addEventListener('click', () => go(1));
+    document.getElementById('btnNewQuote').addEventListener('click', () => {
+      resetNewQuote();
+      go(3);
+    });
+    document.getElementById('navNewQuote').addEventListener('click', () => {
+      resetNewQuote();
+      go(3);
+    });
+    document.getElementById('btnLookup').addEventListener('click', () => {
+      document.getElementById('txtIndustryDesc').value = 'Offices of Physicians';
+    });
+
+    document.getElementById('fileCensus').addEventListener('change', event => {
+      const file = event.target.files[0];
+      if (!file) return;
+      app.censusFiles = [{ name: file.name, type: 'Census', uploadedOn: new Date().toLocaleDateString(), status: 'Parsed' }];
+      document.getElementById('censusFileName').textContent = file.name + ' - parsed';
+      document.getElementById('censusEmpty').classList.add('hidden');
+      document.getElementById('censusResults').classList.remove('hidden');
+    });
+
+    document.getElementById('txtMedicalPaid').addEventListener('input', updateCombinedPaid);
+    document.getElementById('txtRxPaid').addEventListener('input', updateCombinedPaid);
+    document.getElementById('txtClaimantsOver').addEventListener('input', updateReferralFlag);
+    document.getElementById('txtShockLiability').addEventListener('input', updateReferralFlag);
+
+    document.getElementById('btnAddDiagnosis').addEventListener('click', () => {
+      document.getElementById('diagnosisEntry').classList.remove('hidden');
+      document.getElementById('txtDiagnosisCode').focus();
+    });
+
+    document.getElementById('btnCancelDiagnosis').addEventListener('click', clearDiagnosisEntry);
+
+    document.getElementById('btnSaveDiagnosis').addEventListener('click', () => {
+      const code = document.getElementById('txtDiagnosisCode').value.trim();
+      const description = document.getElementById('txtDiagnosisDesc').value.trim();
+      const category = document.getElementById('txtDiagnosisCategory').value.trim();
+      if (!code || !description || !category) {
+        alert('Please enter ICD-10 code, description, and category.');
+        return;
+      }
+      appendDiagnosis(code, description, category);
+      clearDiagnosisEntry();
+    });
+
+    document.getElementById('diagnosisBody').addEventListener('click', event => {
+      if (event.target.classList.contains('mini-delete')) {
+        event.target.closest('tr').remove();
+      }
+    });
+
+    document.getElementById('btnSubmit').addEventListener('click', () => {
+      if (!document.getElementById('chkAttestation').checked) {
+        alert('Please complete the attestation before submitting.');
+        return;
+      }
+      if (!validateRequired()) {
+        alert('Please complete the required fields before submitting.');
+        return;
+      }
+      generateQuote();
+      renderStatus();
+      go(10);
+    });
+
+    document.getElementById('btnPrint').addEventListener('click', () => window.print());
+    document.getElementById('btnDownloadPDF').addEventListener('click', downloadQuotePdf);
+
+    updateReferralFlag();
+  </script>
+</body>
+</html>
 

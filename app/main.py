@@ -1,4 +1,3 @@
-```python
 from fastapi import FastAPI
 from docxtpl import DocxTemplate
 from datetime import datetime
@@ -62,4 +61,4 @@ async def generate_document(payload: Dict[str, Any]):
             "status": "failed",
             "error": str(ex)
         }
-```
+

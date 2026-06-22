@@ -6,7 +6,7 @@ from typing import Dict, Any
 import base64
 import os
 
-from config import TEMPLATE_FILE, OUTPUT_FOLDER
+from app.config import TEMPLATE_FILE, OUTPUT_FOLDER
 
 app = FastAPI(
     title="AgentHack Document Generator",

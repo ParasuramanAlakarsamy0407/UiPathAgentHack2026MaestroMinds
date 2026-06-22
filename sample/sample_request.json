@@ -1,0 +1,12 @@
+{
+  "Client_Firmographics": {
+    "Company_Name": "Acme Global Solutions"
+  },
+  "Broker_Details": {
+    "Contact_Name": "John Smith",
+    "Contact_Email": "john.smith@test.com"
+  },
+  "Quote_Parameters": {
+    "Requested_Effective_Date": "2026-10-01"
+  }
+}

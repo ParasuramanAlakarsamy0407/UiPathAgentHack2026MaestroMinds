@@ -16,7 +16,7 @@ GOOGLE_DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
 
 TEMPLATE_FILE = "templates/Carrier_Quote_Template.docx"
 OUTPUT_FOLDER = "generated"
-TOKEN_FILE = "credentials/token.pickle"
+TOKEN_FILE = "/etc/secrets/token.pickle"
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 

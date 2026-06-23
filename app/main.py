@@ -16,21 +16,26 @@ GOOGLE_DRIVE_FOLDER_ID = os.getenv("GOOGLE_DRIVE_FOLDER_ID")
 
 TEMPLATE_FILE = "templates/Carrier_Quote_Template.docx"
 OUTPUT_FOLDER = "generated"
-TOKEN_FILE = "/etc/secrets/token.pickle"
+TOKEN_FILE = "/etc/secrets/token.json"
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 
+from google.oauth2.credentials import Credentials
+
 def upload_to_google_drive(file_path: str):
 
-    with open(TOKEN_FILE, "rb") as token:
-        creds = pickle.load(token)
+    creds = Credentials.from_authorized_user_file(
+        TOKEN_FILE,
+        ["https://www.googleapis.com/auth/drive.file"]
+    )
 
     service = build(
         "drive",
         "v3",
         credentials=creds
     )
+
 
     file_name = os.path.basename(file_path)
 

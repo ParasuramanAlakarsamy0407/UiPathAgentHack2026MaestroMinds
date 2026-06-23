@@ -116,3 +116,24 @@ async def generate_document(payload: Dict[str, Any]):
             "status": "failed",
             "error": str(ex)
         }
+
+
+@app.get("/debug-token")
+def debug_token():
+
+    import os
+
+    path = "/etc/secrets/token.pickle"
+
+    if not os.path.exists(path):
+        return {"exists": False}
+
+    with open(path, "rb") as f:
+        first_20_bytes = f.read(20)
+
+    return {
+        "exists": True,
+        "first_bytes": str(first_20_bytes)
+    }
+
+

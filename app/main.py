@@ -22,18 +22,17 @@ TOKEN_FILE = "credentials/token.pickle"
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
-def upload_to_google_drive(file_path: str):
 
-```
-with open(TOKEN_FILE, "rb") as token:
-    creds = pickle.load(token)
+def upload_to_google_drive(file_path):
 
-service = build(
-    "drive",
-    "v3",
-    credentials=creds
-)
+    with open(TOKEN_FILE, "rb") as token:
+        creds = pickle.load(token)
 
+    service = build(
+        "drive",
+        "v3",
+        credentials=creds
+    )
 file_name = os.path.basename(file_path)
 
 file_metadata = {
@@ -121,4 +120,3 @@ except Exception as ex:
         "status": "failed",
         "error": str(ex)
     }
-```

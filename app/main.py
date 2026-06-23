@@ -62,21 +62,21 @@ service.permissions().create(
 ).execute()
 
 return f"https://drive.google.com/file/d/{file_id}/view"
-```
+
 
 @app.get("/")
 def health_check():
 
-```
+
 return {
     "status": "running"
 }
-```
+
 
 @app.post("/generate")
 async def generate_document(payload: Dict[str, Any]):
 
-```
+
 try:
 
     if not GOOGLE_DRIVE_FOLDER_ID:

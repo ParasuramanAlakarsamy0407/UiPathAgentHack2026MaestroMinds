@@ -6,6 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 import pickle
 import os
+import json
 
 app = FastAPI(
     title="AgentHack Document Generator",
@@ -78,50 +79,76 @@ def health_check():
 @app.post("/generate")
 async def generate_document(payload: Dict[str, Any]):
 
+try:
+
+    if not GOOGLE_DRIVE_FOLDER_ID:
+        raise Exception(
+            "GOOGLE_DRIVE_FOLDER_ID environment variable not configured"
+        )
+
+    # Get Request ID from incoming JSON
+    request_id = payload["Transaction"]["Request_ID"]
+
+    # Read JSON2
+    json2_path = os.path.join(
+        "AppData",
+        f"{request_id}.json"
+    )
+
+    if not os.path.exists(json2_path):
+        raise Exception(
+            f"JSON2 file not found: {json2_path}"
+        )
+
+    with open(json2_path, "r", encoding="utf-8") as f:
+        json2 = json.load(f)
+
+    # Merge JSON1 + JSON2
+    merged_payload = {
+        **payload,
+        **json2
+    }
+
+    # Load template
+    doc = DocxTemplate(TEMPLATE_FILE)
+
+    # Render
+    doc.render(merged_payload)
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+    file_name = f"Quote_{timestamp}.docx"
+
+    output_path = os.path.join(
+        OUTPUT_FOLDER,
+        file_name
+    )
+
+    doc.save(output_path)
+
+    file_url = upload_to_google_drive(
+        output_path
+    )
+
     try:
+        os.remove(output_path)
+    except:
+        pass
 
-        if not GOOGLE_DRIVE_FOLDER_ID:
-            raise Exception(
-                "GOOGLE_DRIVE_FOLDER_ID environment variable not configured"
-            )
+    return {
+        "status": "success",
+        "request_id": request_id,
+        "json2_file": json2_path,
+        "file_name": file_name,
+        "file_url": file_url
+    }
 
-        doc = DocxTemplate(TEMPLATE_FILE)
+except Exception as ex:
 
-        doc.render(payload)
-
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-
-        file_name = f"Quote_{timestamp}.docx"
-
-        output_path = os.path.join(
-            OUTPUT_FOLDER,
-            file_name
-        )
-
-        doc.save(output_path)
-
-        file_url = upload_to_google_drive(
-            output_path
-        )
-
-        try:
-            os.remove(output_path)
-        except:
-            pass
-
-        return {
-            "status": "success",
-            "file_name": file_name,
-            "file_url": file_url
-        }
-
-    except Exception as ex:
-
-        return {
-            "status": "failed",
-            "error": str(ex)
-        }
-
+    return {
+        "status": "failed",
+        "error": str(ex)
+    }
 
 @app.get("/debug-token")
 def debug_token():

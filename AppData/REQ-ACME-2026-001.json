@@ -1,0 +1,214 @@
+{
+"Proposal": {
+"Proposal_Number": "MAG-2026-088312",
+"Proposal_Date": "June 20, 2026",
+"Proposal_Expiration": "August 25, 2026",
+"Annual_Program_Cost": "$56,800,892",
+"Composite_PMPM": "$833.35"
+},
+
+"Premium_Totals": {
+"Total_Employees": 2502,
+"Total_PEPM": "$1,891.85"
+},
+
+"Premium_Rate_Schedule": [
+{
+"Enrollment_Tier": "Employee Only",
+"Employees": 1126,
+"Relativity": "1.00x",
+"PEPM": "$1,074.72",
+"Annual_Premium": "$14,521,673"
+},
+{
+"Enrollment_Tier": "Employee + Spouse",
+"Employees": 551,
+"Relativity": "2.05x",
+"PEPM": "$2,203.18",
+"Annual_Premium": "$14,567,456"
+},
+{
+"Enrollment_Tier": "Employee + Children",
+"Employees": 375,
+"Relativity": "1.95x",
+"PEPM": "$2,095.71",
+"Annual_Premium": "$9,430,705"
+},
+{
+"Enrollment_Tier": "Family",
+"Employees": 450,
+"Relativity": "3.15x",
+"PEPM": "$3,385.38",
+"Annual_Premium": "$18,281,058"
+}
+],
+
+"Premium_Component_Breakdown": {
+"Expected_Claims_Funding": {
+"PMPM": "$663.25",
+"PEPM": "$1,505.70",
+"Annual": "$45,207,245"
+},
+"ASO_Administration_Fee": {
+"PMPM": "$54.72",
+"PEPM": "$124.22",
+"Annual": "$3,729,598"
+},
+"Specific_ISL_Premium": {
+"PMPM": "$111.43",
+"PEPM": "$252.96",
+"Annual": "$7,594,817"
+},
+"Aggregate_Premium": {
+"PMPM": "$3.95",
+"PEPM": "$8.97",
+"Annual": "$269,232"
+}
+},
+
+"Specific_Stop_Loss": {
+"Reimbursement_Cap": "Unlimited per individual",
+"Laser_Policy": "No New Laser confirmed for all currently enrolled members"
+},
+
+"Aggregate_Stop_Loss": {
+"Aggregate_Attachment_Factor": "120%",
+"Aggregate_Attachment_Point_Annual": "$54,248,694",
+"Funding_Pattern": "Level (1/12th per month)",
+"Aggregate_Maximum_Reimbursement": "$1,500,000"
+},
+
+"Monthly_Attachment_Schedule": [
+{
+"Month": "Month 1",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$4,520,724"
+},
+{
+"Month": "Month 2",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$9,041,449"
+},
+{
+"Month": "Month 3",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$13,562,174"
+},
+{
+"Month": "Month 4",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$18,082,898"
+},
+{
+"Month": "Month 5",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$22,603,622"
+},
+{
+"Month": "Month 6",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$27,124,347"
+},
+{
+"Month": "Month 7",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$31,645,071"
+},
+{
+"Month": "Month 8",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$36,165,796"
+},
+{
+"Month": "Month 9",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$40,686,520"
+},
+{
+"Month": "Month 10",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$45,207,245"
+},
+{
+"Month": "Month 11",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$49,727,970"
+},
+{
+"Month": "Month 12",
+"Percent_Attachment": "8.33%",
+"Cumulative_Attachment_Point": "$54,248,694"
+}
+],
+
+"Experience_Summary": {
+"Large_Claim_Liability_Excluded_From_Trend": "$3,345,000",
+"Net_Baseline_PMPM": "$619.61",
+"Trend_Assumption": "9.5% annual, 9-month projection to effective date (7.04% applied)",
+"Projected_Net_PMPM": "$663.25",
+"Underwriting_Note": "Meridian's ISL premium load (16.8%) reflects a more conservative view of ongoing exposure from LC-2026-001 and LC-2026-002 relative to other markets."
+},
+
+"Large_Claimants": [
+{
+"Ref_Number": "LC-2026-001",
+"Age_Sex": "58 / M",
+"Diagnosis": "C34.90 - Lung malignancy",
+"Paid_To_Date": "$612,000",
+"Status": "Active Treatment",
+"Disposition": "No Laser"
+},
+{
+"Ref_Number": "LC-2026-002",
+"Age_Sex": "61 / F",
+"Diagnosis": "N18.5 - CKD Stage 5",
+"Paid_To_Date": "$487,000",
+"Status": "Active Treatment",
+"Disposition": "No Laser"
+},
+{
+"Ref_Number": "LC-2026-003",
+"Age_Sex": "0 / M",
+"Diagnosis": "P07.23 - Extreme Prematurity",
+"Paid_To_Date": "$398,000",
+"Status": "Resolved",
+"Disposition": "No Laser"
+},
+{
+"Ref_Number": "LC-2026-004",
+"Age_Sex": "44 / F",
+"Diagnosis": "G35 - Multiple Sclerosis",
+"Paid_To_Date": "$265,000",
+"Status": "Active Treatment",
+"Disposition": "No Laser"
+},
+{
+"Ref_Number": "LC-2026-005",
+"Age_Sex": "52 / M",
+"Diagnosis": "C91.00 - ALL (Remission)",
+"Paid_To_Date": "$310,000",
+"Status": "Remission",
+"Disposition": "No Laser"
+},
+{
+"Ref_Number": "LC-2026-006",
+"Age_Sex": "67 / M",
+"Diagnosis": "I21.4 - Acute MI (Resolved)",
+"Paid_To_Date": "$168,000",
+"Status": "Resolved",
+"Disposition": "No Laser"
+}
+],
+
+"Broker_Compensation": {
+"Commission_Rate": "2.75% of Specific + Aggregate Stop Loss Premium"
+},
+
+"Tier_Relativity_Display": "1.00x / 2.05x / 1.95x / 3.15x",
+
+"Contact": {
+"Company_Name": "Meridian Assurance Group",
+"Division": "Self-Funded Employer Solutions | Stop Loss Underwriting",
+"Email": "[stoploss-underwriting@meridianassurance-quotes.example.com](mailto:stoploss-underwriting@meridianassurance-quotes.example.com)"
+}
+}

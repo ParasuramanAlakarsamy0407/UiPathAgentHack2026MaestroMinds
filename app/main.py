@@ -4,7 +4,6 @@ from datetime import datetime
 from typing import Dict, Any
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-import pickle
 import os
 import json
 from pydantic import BaseModel
@@ -28,27 +27,6 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
 
 from google.oauth2.credentials import Credentials
-
-def upload_to_google_drive(file_path: str):
-
-    creds = Credentials.from_authorized_user_file(
-        TOKEN_FILE,
-        ["https://www.googleapis.com/auth/drive.file"]
-    )
-
-    service = build(
-        "drive",
-        "v3",
-        credentials=creds
-    )
-
-
-    file_name = os.path.basename(file_path)
-
-    file_metadata = {
-        "name": file_name,
-        "parents": [GOOGLE_DRIVE_FOLDER_ID]
-    }
 
 def upload_to_google_drive(file_path: str, mime_type: str):
 
@@ -74,24 +52,6 @@ def upload_to_google_drive(file_path: str, mime_type: str):
         file_path,
         mimetype=mime_type
     )
-
-    uploaded_file = service.files().create(
-        body=file_metadata,
-        media_body=media,
-        fields="id,name"
-    ).execute()
-
-    file_id = uploaded_file["id"]
-
-    service.permissions().create(
-        fileId=file_id,
-        body={
-            "type": "anyone",
-            "role": "reader"
-        }
-    ).execute()
-
-    return f"https://drive.google.com/file/d/{file_id}/view"
 
     uploaded_file = service.files().create(
         body=file_metadata,
@@ -190,7 +150,7 @@ def debug_token():
 
     import os
 
-    path = "/etc/secrets/token.pickle"
+    path = TOKEN_FILE
 
     if not os.path.exists(path):
         return {"exists": False}

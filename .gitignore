@@ -1,0 +1,12 @@
+generated/
+
+credentials/
+credentials.json
+token.json
+token.pickle
+
+**pycache**/
+*.pyc
+.env
+.vscode/
+.idea/

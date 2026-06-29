@@ -7,7 +7,7 @@ from googleapiclient.http import MediaFileUpload
 import os
 import json
 from pydantic import BaseModel
-from playwright.sync_api import sync_playwright
+from weasyprint import HTML
 
 class HtmlToPdfRequest(BaseModel):
     html_content: str
@@ -166,57 +166,97 @@ def debug_token():
 
 
 
+
 @app.post("/html-to-pdf")
 def html_to_pdf(request: HtmlToPdfRequest):
+
     try:
 
         if not GOOGLE_DRIVE_FOLDER_ID:
-            raise Exception(
-                "GOOGLE_DRIVE_FOLDER_ID environment variable not configured"
-            )
+            raise Exception("GOOGLE_DRIVE_FOLDER_ID environment variable not configured")
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 
-        file_name = (
-            request.output_file_name
-            if request.output_file_name
-            else f"HTML_{timestamp}.pdf"
-        )
+        file_name = request.output_file_name if request.output_file_name else f"HTML_{timestamp}.pdf"
 
         if not file_name.lower().endswith(".pdf"):
             file_name += ".pdf"
 
-        output_path = os.path.join(
-            OUTPUT_FOLDER,
-            file_name
-        )
+        output_path = os.path.join(OUTPUT_FOLDER, file_name)
 
-        with sync_playwright() as p:
+        html_document = f"""
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+@page{
+    size:A4 landscape;
+    margin:10mm;
+}
+html,body{
+    margin:0;
+    padding:0;
+    font-family:Arial,Helvetica,sans-serif;
+    font-size:10px;
+}
+.container{
+    width:100% !important;
+    max-width:none !important;
+    margin:0 auto !important;
+    box-shadow:none !important;
+    border-radius:0 !important;
+}
+.section{
+    padding:15px !important;
+}
+table{
+    width:100% !important;
+    border-collapse:collapse;
+    table-layout:fixed;
+    page-break-inside:auto;
+}
+thead{
+    display:table-header-group;
+}
+tfoot{
+    display:table-footer-group;
+}
+tr{
+    page-break-inside:avoid;
+    page-break-after:auto;
+}
+th,td{
+    padding:5px !important;
+    font-size:9px !important;
+    word-break:break-word;
+    white-space:normal;
+}
+img{
+    max-width:100%;
+    height:auto;
+}
+.comparison-grid{
+    display:block !important;
+}
+.carrier-card{
+    margin-bottom:15px !important;
+}
+.risk-meter{
+    display:block !important;
+}
+.header .meta{
+    display:block !important;
+}
+</style>
+</head>
+<body>
+{request.html_content}
+</body>
+</html>
+"""
 
-            browser = p.chromium.launch(headless=True)
-
-            page = browser.new_page()
-
-            page.set_content(
-                request.html_content,
-                wait_until="load"
-            )
-
-            page.pdf(
-                path=output_path,
-                format="A4",
-                print_background=True,
-                display_header_footer=False,
-                prefer_css_page_size=True,
-                margin={
-                    "top":"15mm",
-                    "right":"15mm",
-                    "bottom":"15mm",
-                    "left":"15mm"
-                }
-            )
-
-            browser.close()
+        HTML(string=html_document).write_pdf(output_path)
 
         file_url = upload_to_google_drive(
             output_path,
@@ -230,7 +270,6 @@ def html_to_pdf(request: HtmlToPdfRequest):
         }
 
     except Exception as ex:
-
         return {
             "status":"failed",
             "error":str(ex)

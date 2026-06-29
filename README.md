@@ -12,7 +12,7 @@
 |-|-|
 |**Repository**|[https://github.com/ParasuramanAlakarsamy0407/UiPathAgentHack2026MaestroMinds](https://github.com/ParasuramanAlakarsamy0407/UiPathAgentHack2026MaestroMinds)|
 |**Team Name**|MaestroMinds|
-|**Team Members**|Guhan Eshwar, Parasuraman, Praison Thomas, Ainul Inayas|
+|**Team Members**|Guhan Eshwar, Parasuraman, Praison Thomas, Ainul Inaya|
 
 \---
 

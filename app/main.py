@@ -165,9 +165,9 @@ def debug_token():
 
 
 
-@app.post("/html-to-pdf")
-async def html_to_pdf(request: HtmlToPdfRequest):
 
+@app.post("/html-to-pdf")
+def html_to_pdf(request: HtmlToPdfRequest):
     try:
 
         if not GOOGLE_DRIVE_FOLDER_ID:

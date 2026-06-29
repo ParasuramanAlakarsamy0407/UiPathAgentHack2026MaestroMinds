@@ -1164,7 +1164,8 @@
       pdf += `trailer << /Root 1 0 R /Size ${objects.length + 1} >>\nstartxref\n${xref}\n%%EOF`;
       return pdf;
     }
-function downloadQuotePdf() {
+
+    function downloadQuotePdf() {
     const githubUrl = 'https://raw.githubusercontent.com/ParasuramanAlakarsamy0407/UiPathAgentHack2026MaestroMinds/Document/REQ-ACME-2026-001-quote.pdf';
     fetch(githubUrl)
         .then(response => {
@@ -1187,8 +1188,9 @@ function downloadQuotePdf() {
             alert('Failed to download the default quote file from GitHub. Please check the URL and try again.\nError: ' + error.message);
         });
 }
-
-
+    document.querySelectorAll('[data-jump]').forEach(button => {
+      button.addEventListener('click', () => go(button.dataset.jump));
+    });
 
     document.querySelectorAll('[data-next]').forEach(button => {
       button.addEventListener('click', () => {

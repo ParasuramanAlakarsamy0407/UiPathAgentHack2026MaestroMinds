@@ -190,64 +190,64 @@ def html_to_pdf(request: HtmlToPdfRequest):
 <head>
 <meta charset="UTF-8">
 <style>
-@page{
+@page{{
     size:A4 landscape;
     margin:10mm;
-}
-html,body{
+}}
+html,body{{
     margin:0;
     padding:0;
     font-family:Arial,Helvetica,sans-serif;
     font-size:10px;
-}
-.container{
+}}
+.container{{
     width:100% !important;
     max-width:none !important;
     margin:0 auto !important;
     box-shadow:none !important;
     border-radius:0 !important;
-}
-.section{
+}}
+.section{{
     padding:15px !important;
-}
-table{
+}}
+table{{
     width:100% !important;
     border-collapse:collapse;
     table-layout:fixed;
     page-break-inside:auto;
-}
-thead{
+}}
+thead{{
     display:table-header-group;
-}
-tfoot{
+}}
+tfoot{{
     display:table-footer-group;
-}
-tr{
+}}
+tr{{
     page-break-inside:avoid;
     page-break-after:auto;
-}
-th,td{
+}}
+th,td{{
     padding:5px !important;
     font-size:9px !important;
     word-break:break-word;
     white-space:normal;
-}
-img{
+}}
+img{{
     max-width:100%;
     height:auto;
-}
-.comparison-grid{
+}}
+.comparison-grid{{
     display:block !important;
-}
-.carrier-card{
+}}
+.carrier-card{{
     margin-bottom:15px !important;
-}
-.risk-meter{
+}}
+.risk-meter{{
     display:block !important;
-}
-.header .meta{
+}}
+.header .meta{{
     display:block !important;
-}
+}}
 </style>
 </head>
 <body>

@@ -1164,30 +1164,31 @@
       pdf += `trailer << /Root 1 0 R /Size ${objects.length + 1} >>\nstartxref\n${xref}\n%%EOF`;
       return pdf;
     }
+function downloadQuotePdf() {
+    const githubUrl = 'https://raw.githubusercontent.com/ParasuramanAlakarsamy0407/UiPathAgentHack2026MaestroMinds/Document/REQ-ACME-2026-001-quote.pdf';
+    fetch(githubUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            const fileName = 'REQ-ACME-2026-001-quote.pdf';
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(link.href);
+        })
+        .catch(error => {
+            alert('Failed to download the default quote file from GitHub. Please check the URL and try again.\nError: ' + error.message);
+        });
+}
 
-    function downloadQuotePdf() {
-      if (!app.quoteGenerated) generateQuote();
-      renderQuote();
-      const lines = [
-        'Northstar Health Solutions - Stop Loss Quote',
-        'Request ID: REQ-ACME-2026-001',
-        'Company: ' + document.getElementById('quoteCompany').textContent,
-        'Specific Deductible: ' + document.getElementById('quoteDeductible').textContent,
-        'Aggregate Factor: ' + document.getElementById('quoteAgg').textContent,
-        'Contract Basis: ' + document.getElementById('quoteContract').textContent,
-        'Employee Only Rate: ' + document.getElementById('rateEmployee').textContent,
-        'Employee + Spouse Rate: ' + document.getElementById('rateSpouse').textContent,
-        'Family Rate: ' + document.getElementById('rateFamily').textContent,
-        'Aggregate Premium: ' + document.getElementById('aggregatePremium').textContent,
-        'Referral Flag: YES - Claimants over stop-loss threshold',
-        'Generated immediately after submission for hackathon demo.'
-      ];
-      downloadBlob('REQ-ACME-2026-001-quote.pdf', makePdfContent(lines), 'application/pdf');
-    }
 
-    document.querySelectorAll('[data-jump]').forEach(button => {
-      button.addEventListener('click', () => go(button.dataset.jump));
-    });
 
     document.querySelectorAll('[data-next]').forEach(button => {
       button.addEventListener('click', () => {

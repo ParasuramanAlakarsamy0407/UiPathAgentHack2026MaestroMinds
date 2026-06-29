@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI-Powered Quote Automation — Live Architecture</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root{
+    --bg:#0A0F1C;
+    --bg-2:#0E1526;
+    --panel:#121A2E;
+    --panel-2:#16203A;
+    --line:#22304F;
+    --line-soft:#1A2540;
+    --text:#EAF0FB;
+    --text-dim:#8FA0C2;
+    --text-faint:#56668F;
+    --orange:#FA4616;
+    --orange-glow:rgba(250,70,22,0.35);
+    --violet:#8A6CFF;
+    --violet-glow:rgba(138,108,255,0.35);
+    --teal:#1FE3C4;
+    --teal-glow:rgba(31,227,196,0.35);
+    --amber:#FFB020;
+    --amber-glow:rgba(255,176,32,0.35);
+    --green:#33D17A;
+    --red:#FF5470;
+  }
+
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    width:1920px; height:1080px;
+    background:
+      radial-gradient(1100px 700px at 14% -6%, rgba(138,108,255,0.10), transparent 60%),
+      radial-gradient(900px 600px at 95% 10%, rgba(31,227,196,0.07), transparent 55%),
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    overflow:hidden;
+  }
+  .mono{ font-family:'JetBrains Mono',monospace; }
+
+  /* ===== Background grid texture ===== */
+  .grid-bg{
+    position:absolute; inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events:none;
+  }
+
+  /* ===== Header ===== */
+  .header{
+    position:absolute; top:0; left:0; right:0; height:92px;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:0 44px;
+    border-bottom:1px solid var(--line-soft);
+    background:linear-gradient(180deg, rgba(14,21,38,0.9), rgba(14,21,38,0.5));
+    z-index:50;
+  }
+  .header-left{ display:flex; flex-direction:column; gap:4px; }
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:3px;
+    color:var(--teal); font-weight:600; text-transform:uppercase;
+    display:flex; align-items:center; gap:8px;
+  }
+  .eyebrow .dot{ width:7px; height:7px; border-radius:50%; background:var(--teal); box-shadow:0 0 10px var(--teal); animation:pulse-dot 1.6s infinite; }
+  @keyframes pulse-dot{ 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+  h1{ font-size:27px; font-weight:800; letter-spacing:-0.5px; }
+  h1 span{ color:var(--orange); }
+  .subtitle{ font-size:13.5px; color:var(--text-dim); font-weight:500; margin-top:1px;}
+
+  .header-right{ display:flex; align-items:center; gap:28px; }
+  .legend{ display:flex; gap:18px; }
+  .legend-item{ display:flex; align-items:center; gap:7px; font-size:11.5px; color:var(--text-dim); font-weight:500;}
+  .legend-swatch{ width:10px; height:10px; border-radius:3px; }
+
+  .progress-wrap{
+    position:absolute; top:92px; left:0; right:0; height:5px;
+    background:var(--line-soft); z-index:50;
+  }
+  .progress-bar{
+    height:100%; width:0%;
+    background:linear-gradient(90deg, var(--orange), var(--violet), var(--teal));
+    box-shadow:0 0 14px rgba(138,108,255,0.6);
+    transition:width 0.6s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ===== Layout ===== */
+  .stage-wrap{
+    position:absolute; top:122px; left:0; right:0; bottom:64px;
+    display:flex;
+  }
+  .main-col{
+    flex:1; position:relative; padding:26px 26px 10px 40px;
+    display:flex; flex-direction:column;
+  }
+  .side-col{
+    width:296px; flex-shrink:0; padding:26px 36px 10px 14px;
+    border-left:1px solid var(--line-soft);
+    display:flex; flex-direction:column; gap:14px;
+  }
+
+  /* step rail number */
+  .step-rail{
+    position:absolute; top:122px; bottom:64px; left:0; width:40px;
+    display:flex; flex-direction:column; align-items:center;
+    z-index:5;
+  }
+
+  /* ===== Stage card ===== */
+  .stage{
+    position:absolute; top:26px; left:40px; right:288px; bottom:10px;
+    display:none;
+    flex-direction:column;
+    opacity:0;
+  }
+  .stage.active{ display:flex; }
+
+  .stage-head{ display:flex; align-items:flex-start; gap:18px; margin-bottom:26px; }
+  .stage-num{
+    width:54px; height:54px; border-radius:14px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:24px; font-weight:800; font-family:'JetBrains Mono',monospace;
+    background:linear-gradient(145deg, var(--panel-2), var(--panel));
+    border:1.5px solid var(--line);
+    color:var(--text); flex-shrink:0;
+    box-shadow:0 8px 24px rgba(0,0,0,0.35);
+  }
+  .stage-titles{ flex:1; min-width:0; }
+  .stage-titles h2{ font-size:23px; font-weight:800; letter-spacing:-0.3px; margin-bottom:5px;}
+  .stage-titles p{ font-size:14px; color:var(--text-dim); max-width:680px; line-height:1.5; font-weight:450;}
+
+  .stage-body{
+    flex:1; display:flex; gap:22px; align-items:center;
+    min-height:0;
+  }
+
+  /* generic box */
+  .box{
+    background:linear-gradient(160deg, var(--panel-2), var(--panel));
+    border:1.5px solid var(--line);
+    border-radius:16px;
+    padding:24px 26px;
+    position:relative;
+    box-shadow:0 10px 30px rgba(0,0,0,0.3);
+    align-self:center;
+  }
+  .box-title{
+    display:flex; align-items:center; gap:10px;
+    font-size:17px; font-weight:700; margin-bottom:17px;
+    color:var(--text);
+  }
+  .box-title .ic{ width:30px; height:30px; flex-shrink:0; }
+  .box ul{ list-style:none; display:flex; flex-direction:column; gap:14px; }
+  .box li{
+    font-size:14.5px; color:var(--text-dim); font-weight:500;
+    display:flex; align-items:flex-start; gap:10px; line-height:1.45;
+  }
+  .box li::before{
+    content:''; width:6px; height:6px; border-radius:50%;
+    background:var(--teal); margin-top:7px; flex-shrink:0;
+    box-shadow:0 0 6px var(--teal-glow);
+  }
+
+  .box.accent-orange{ border-color:rgba(250,70,22,0.4); }
+  .box.accent-orange .box-title{ color:var(--orange); }
+  .box.accent-violet{ border-color:rgba(138,108,255,0.4); }
+  .box.accent-violet .box-title{ color:var(--violet); }
+  .box.accent-teal{ border-color:rgba(31,227,196,0.4); }
+  .box.accent-teal .box-title{ color:var(--teal); }
+  .box.accent-amber{ border-color:rgba(255,176,32,0.4); }
+  .box.accent-amber .box-title{ color:var(--amber); }
+  .box.accent-green{ border-color:rgba(51,209,122,0.4); }
+  .box.accent-green .box-title{ color:var(--green); }
+
+  .col-main{ flex:1.5; min-width:0; display:flex; flex-direction:column; gap:16px;}
+  .col-side{ flex:1; min-width:0; display:flex; flex-direction:column; gap:16px;}
+  .row-split{ display:flex; gap:16px; align-items:center; }
+  .row-split > .box{ flex:1; }
+
+  .output-tag{
+    margin-top:20px; padding-top:16px; border-top:1px dashed var(--line);
+    display:flex; align-items:center; gap:10px;
+  }
+  .output-label{ font-size:10.5px; text-transform:uppercase; letter-spacing:1.5px; color:var(--text-faint); font-weight:700;}
+  .output-value{ font-size:13px; font-weight:700; color:var(--text); font-family:'JetBrains Mono',monospace;}
+
+  /* file chips */
+  .file-row{ display:flex; gap:10px; margin-top:4px; flex-wrap:wrap;}
+  .file-chip{
+    display:flex; flex-direction:column; align-items:center; gap:6px;
+    padding:10px 12px; border-radius:10px;
+    background:rgba(255,255,255,0.03); border:1px solid var(--line-soft);
+    font-size:10.5px; color:var(--text-dim); font-weight:600; min-width:64px;
+  }
+  .file-chip .ficon{ font-size:18px; }
+
+  /* connectors / particles */
+  .conn{
+    position:relative; flex-shrink:0; width:64px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .conn-line{
+    width:100%; height:3px; background:var(--line); border-radius:2px; position:relative; overflow:visible;
+  }
+  .conn-line::after{
+    content:''; position:absolute; right:-2px; top:50%; transform:translateY(-50%);
+    width:0; height:0; border-top:5px solid transparent; border-bottom:5px solid transparent;
+    border-left:8px solid var(--line);
+  }
+  .particle{
+    position:absolute; top:50%; left:0; width:9px; height:9px; border-radius:50%;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 12px 3px currentColor;
+    animation:travel 1.6s ease-in-out infinite;
+  }
+  @keyframes travel{
+    0%{ left:0%; opacity:0; }
+    10%{ opacity:1; }
+    90%{ opacity:1; }
+    100%{ left:100%; opacity:0; }
+  }
+
+  /* vertical connector (between stacked steps within a stage, e.g. join) */
+  .vconn{ display:flex; flex-direction:column; align-items:center; justify-content:center; width:100%; padding:6px 0;}
+  .vline{ width:3px; height:30px; background:var(--line); position:relative; }
+  .vline::after{ content:''; position:absolute; bottom:-2px; left:50%; transform:translateX(-50%);
+    width:0; height:0; border-left:5px solid transparent; border-right:5px solid transparent; border-top:8px solid var(--line); }
+
+  /* JOIN node */
+  .join-node{
+    width:74px; height:74px; border-radius:50%;
+    border:2px solid var(--violet);
+    display:flex; align-items:center; justify-content:center;
+    flex-direction:column; gap:1px;
+    background:radial-gradient(circle, rgba(138,108,255,0.18), transparent 70%);
+    box-shadow:0 0 28px var(--violet-glow);
+    font-weight:800; font-size:12px; color:var(--violet); font-family:'JetBrains Mono',monospace;
+    animation:join-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes join-pulse{ 0%,100%{ box-shadow:0 0 18px var(--violet-glow);} 50%{ box-shadow:0 0 34px var(--violet-glow);} }
+
+  /* icons - simple inline SVG via mask not needed, use unicode/emoji-free shapes */
+  .icon-circle{
+    width:30px;height:30px;border-radius:9px; display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,0.05); flex-shrink:0;
+  }
+
+  /* ===== Side column (right rail) ===== */
+  .side-title{
+    font-size:11px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase;
+    margin-bottom:4px; padding-left:2px;
+  }
+  .side-box{
+    background:rgba(255,255,255,0.02);
+    border:1px solid var(--line-soft);
+    border-radius:12px; padding:13px 14px;
+    display:flex; align-items:center; gap:11px;
+    transition:all 0.4s ease;
+    opacity:0.35;
+  }
+  .side-box.lit{
+    opacity:1;
+    border-color:rgba(31,227,196,0.45);
+    background:rgba(31,227,196,0.06);
+    box-shadow:0 0 18px rgba(31,227,196,0.12);
+  }
+  .side-box .sicon{ font-size:18px; width:22px; text-align:center; flex-shrink:0;}
+  .side-box-text{ font-size:11.5px; font-weight:650; color:var(--text-dim); line-height:1.3;}
+  .side-box.lit .side-box-text{ color:var(--text); }
+
+  /* ===== Bottom step rail (timeline) ===== */
+  .timeline{
+  position:absolute; bottom:0; left:0; right:0; height:64px;
+  border-top:1px solid var(--line-soft);
+  background:linear-gradient(0deg, rgba(10,15,28,0.95), rgba(10,15,28,0.7));
+  display:flex; 
+  align-items:flex-start; /* Fixes alignment: Anchors all steps to the top */
+  padding:16px 32px 0 32px; /* Adds top padding to vertically center the dots */
+  gap:6px;
+  z-index:50;
+}
+  .tl-step{
+    flex:1; display:flex; flex-direction:column; align-items:center; gap:6px;
+    cursor:default; position:relative;
+  }
+  .tl-dot{
+    width:13px; height:13px; border-radius:50%;
+    background:var(--line); border:2px solid var(--line);
+    transition:all 0.4s ease; position:relative; z-index:2;
+  }
+  .tl-step.done .tl-dot{ background:var(--teal); border-color:var(--teal); box-shadow:0 0 10px var(--teal-glow);}
+  .tl-step.current .tl-dot{ background:var(--orange); border-color:var(--orange); box-shadow:0 0 14px var(--orange-glow); transform:scale(1.3); }
+  .tl-label{ font-size:9.5px; font-weight:700; color:var(--text-faint); text-align:center; letter-spacing:0.3px; max-width:120px; line-height:1.2; }
+  .tl-step.current .tl-label{ color:var(--orange); }
+  .tl-step.done .tl-label{ color:var(--text-dim); }
+  .tl-bar{ position:absolute; top:6px; left:-50%; width:100%; height:2px; background:var(--line); z-index:1;}
+  .tl-step:first-child .tl-bar{ display:none; }
+  .tl-step.done .tl-bar{ background:var(--teal); }
+  .tl-step.current .tl-bar{ background:linear-gradient(90deg, var(--teal), var(--orange)); }
+
+  /* status pill on stage head */
+  .status-pill{
+    margin-left:auto; padding:7px 16px; border-radius:100px;
+    font-size:11px; font-weight:700; letter-spacing:0.5px; text-transform:uppercase;
+    border:1px solid var(--line); color:var(--text-dim); flex-shrink:0;
+    font-family:'JetBrains Mono',monospace;
+    display:flex; align-items:center; gap:8px;
+    white-space:nowrap;
+  }
+  .status-pill .blip{ width:7px; height:7px; border-radius:50%; background:var(--teal); box-shadow:0 0 8px var(--teal); animation:pulse-dot 1.4s infinite;}
+
+  /* fade transitions */
+  @keyframes fadeIn{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+  .stage.active{ animation:fadeIn 0.55s ease forwards; }
+
+  /* HITL split colors */
+  .verdict-row{ display:flex; gap:14px; margin-top:12px;}
+  .verdict{ flex:1; border-radius:10px; padding:10px 12px; font-size:12px; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .verdict.ok{ background:rgba(51,209,122,0.1); border:1px solid rgba(51,209,122,0.35); color:var(--green);}
+  .verdict.flag{ background:rgba(255,84,112,0.1); border:1px solid rgba(255,84,112,0.35); color:var(--red);}
+
+  /* outcome banner stage (final) */
+  .outcome-banner{
+    display:flex; gap:26px; flex-wrap:wrap; justify-content:center; align-items:center;
+    margin-top:22px;
+  }
+  .outcome-chip{
+    padding:13px 22px; border-radius:12px; background:var(--panel-2); border:1px solid var(--line);
+    font-size:14px; font-weight:700; color:var(--text); display:flex; align-items:center; gap:10px;
+  }
+  .outcome-chip .dotc{ width:8px;height:8px;border-radius:50%; background:var(--teal); box-shadow:0 0 8px var(--teal);}
+
+  /* ===== Nav buttons ===== */
+  .nav-btn{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:56px; height:56px; border-radius:50%;
+    background:rgba(18,26,46,0.9); border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; z-index:60; user-select:none;
+    transition:all 0.2s ease;
+    box-shadow:0 8px 24px rgba(0,0,0,0.4);
+  }
+  .nav-btn:hover{ border-color:var(--teal); background:rgba(31,227,196,0.1); transform:translateY(-50%) scale(1.06); }
+  .nav-btn svg{ width:22px; height:22px; stroke:var(--text); }
+  .nav-btn:hover svg{ stroke:var(--teal); }
+  .nav-btn.disabled{ opacity:0.25; pointer-events:none; }
+  #prevBtn{ left:20px; }
+  #nextBtn{ right:300px; }
+  .nav-btn.finished{ border-color:var(--green); background:rgba(51,209,122,0.12); }
+  .nav-btn.finished svg{ stroke:var(--green); }
+
+  .click-hint{
+    position:absolute; bottom:74px; left:50%; transform:translateX(-50%);
+    font-size:11px; color:var(--text-faint); font-weight:600; letter-spacing:0.5px;
+    font-family:'JetBrains Mono',monospace; pointer-events:none; z-index:40;
+    display:flex; align-items:center; gap:7px;
+    opacity:0.8;
+  }
+  .click-hint .kbd{
+    border:1px solid var(--line); border-radius:4px; padding:1px 6px; font-size:10px; color:var(--text-dim);
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="eyebrow"><span class="dot"></span>Architecture WALKTHROUGH</div>
+    <h1><span>OmniQuote AI:</span>Powered by the A.U.R.A Framework</h1>
+    <div class="subtitle">Automated Underwriting & Risk Architecture</div>
+  </div>
+  <div class="header-right">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--orange)"></div>RPA / UiPath</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--violet)"></div>AI Agent (LLM)</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--teal)"></div>Data / Output</div>
+      <div class="legend-item"><div class="legend-swatch" style="background:var(--amber)"></div>Human-in-the-Loop</div>
+    </div>
+  </div>
+</div>
+<div class="progress-wrap"><div class="progress-bar" id="progressBar"></div></div>
+
+<!-- STAGE WRAPPER -->
+<div class="stage-wrap" id="clickZone" style="cursor:pointer;">
+
+  <!-- STAGE 1 -->
+  <div class="stage" data-stage="1">
+    <div class="stage-head">
+      <div class="stage-num">01</div>
+      <div class="stage-titles">
+        <h2>Trigger &amp; Inbound Ingestion</h2>
+        <p>Inbound RFP email is monitored continuously; matching attachments are downloaded and stored securely for processing.</p>
+      </div>
+      <div class="status-pill"><span class="blip"></span>Unattended Bot Active</div>
+    </div>
+    <div class="stage-body">
+      <div class="box accent-orange col-main">
+        <div class="box-title"><span class="icon-circle">📧</span>UiPath Mail Robot <span class="mono" style="font-size:11px;color:var(--text-faint);font-weight:600;">(Unattended)</span></div>
+        <ul>
+          <li>Monitor inbound mailbox in real time</li>
+          <li>Keyword &amp; domain match for valid RFPs</li>
+          <li>Download email + attachments automatically</li>
+          <li>Store in secure runtime directory</li>
+        </ul>
+      </div>
+      <div class="conn"><div class="conn-line"><div class="particle" style="color:var(--orange); animation-delay:0s;"></div><div class="particle" style="color:var(--orange); animation-delay:0.8s;"></div></div></div>
+      <div class="box accent-teal col-side">
+        <div class="box-title"><span class="icon-circle">🗂️</span>Input Files Captured</div>
+        <div class="file-row">
+          <div class="file-chip"><span class="ficon">📊</span>Census<br>File_01</div>
+          <div class="file-chip"><span class="ficon">📈</span>Claims Exp<br>File_02</div>
+          <div class="file-chip"><span class="ficon">⚠️</span>Claimant Shock<br>File_03</div>
+        </div>
+        <div class="output-tag">
+          <div><div class="output-label">Stored In</div><div class="output-value">/secure-runtime/</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 2 -->
+  <div class="stage" data-stage="2">
+    <div class="stage-head">
+      <div class="stage-num">02</div>
+      <div class="stage-titles">
+        <h2>Structured Extraction — Intake Agent</h2>
+        <p>An LLM-based agent extracts broker &amp; client metadata, analyzes census demographics, and produces one standardized record.</p>
+      </div>
+      <div class="status-pill"><span class="blip" style="background:var(--violet); box-shadow:0 0 8px var(--violet);"></span>LLM Reasoning</div>
+    </div>
+    <div class="stage-body">
+      <div class="box accent-violet col-main">
+        <div class="box-title"><span class="icon-circle">🧠</span>Intake Agent (LLM)</div>
+        <ul>
+          <li>Extract broker &amp; client metadata from documents</li>
+          <li>Analyze census &amp; demographic composition</li>
+          <li>Aggregate key actuarial metrics</li>
+          <li>Generate a single golden record</li>
+        </ul>
+      </div>
+      <div class="conn"><div class="conn-line"><div class="particle" style="color:var(--violet); animation-delay:0.2s;"></div></div></div>
+      <div class="box accent-teal col-side" style="justify-content:center;">
+        <div class="box-title"><span class="icon-circle">{ }</span>Output</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-dim); background:rgba(0,0,0,0.25); border-radius:8px; padding:12px; line-height:1.6;">
+          {<br>&nbsp;&nbsp;"client": "...",<br>&nbsp;&nbsp;"lives": 164,<br>&nbsp;&nbsp;"sic_code": "...",<br>&nbsp;&nbsp;"claims_exp": [...]<br>}
+        </div>
+        <div class="output-tag"><div class="output-value" style="color:var(--teal);">Standardized JSON Payload</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 3 -->
+  <div class="stage" data-stage="3">
+    <div class="stage-head">
+      <div class="stage-num">03</div>
+      <div class="stage-titles">
+        <h2>Asynchronous Carrier Quote Request Orchestration</h2>
+        <p>UiPath Orchestrator triggers simultaneous outreach to modern API-based carriers and legacy RPA-driven carrier portals.</p>
+      </div>
+      <div class="status-pill"><span class="blip" style="background:var(--orange); box-shadow:0 0 8px var(--orange);"></span>Parallel Execution</div>
+    </div>
+    <div class="stage-body" style="flex-direction:column; gap:10px; justify-content:center;">
+      <div class="row-split">
+        <div class="box accent-violet" style="flex:1;">
+          <div class="box-title"><span class="icon-circle">☁️</span>3a · Modern Carriers (API)</div>
+          <ul>
+            <li>Send standardized JSON payload</li>
+            <li>Call FastAPI carrier endpoints</li>
+            <li>Run actuarial rating engine</li>
+            <li>Generate quote PDF</li>
+          </ul>
+          <div class="output-tag"><span style="font-size:18px;">📄</span><div class="output-value">Carrier Quote (PDF)</div></div>
+        </div>
+        <div class="box accent-orange" style="flex:1;">
+          <div class="box-title"><span class="icon-circle">🤖</span>3b · Legacy Carriers (RPA)</div>
+          <ul>
+            <li>Launch browser session</li>
+            <li>Log into legacy carrier portal</li>
+            <li>Populate fields &amp; submit census</li>
+            <li>Download generated quote PDF</li>
+          </ul>
+          <div class="output-tag"><span style="font-size:18px;">📄</span><div class="output-value">Carrier Quote (PDF)</div></div>
+        </div>
+      </div>
+      <div class="vconn">
+        <div style="display:flex; gap:120px;">
+          <div class="vline"></div><div class="vline"></div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:center;">
+        <div class="join-node">JOIN<span style="font-size:8.5px; font-weight:600; opacity:0.8;">wait both</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 4 -->
+  <div class="stage" data-stage="4">
+    <div class="stage-head">
+      <div class="stage-num">04</div>
+      <div class="stage-titles">
+        <h2>Raw Batch Assembly</h2>
+        <p>All carrier quotes are collected, verified, and prepared as a single batch for downstream intelligence analysis.</p>
+      </div>
+      <div class="status-pill"><span class="blip"></span>Orchestrated</div>
+    </div>
+    <div class="stage-body">
+      <div class="box accent-orange col-main">
+        <div class="box-title"><span class="icon-circle">🗃️</span>Batch Assembly</div>
+        <ul>
+          <li>Verify file presence across both branches</li>
+          <li>Assemble quote PDFs into one batch</li>
+          <li>Create file pointer array for the agent</li>
+        </ul>
+      </div>
+      <div class="conn"><div class="conn-line"><div class="particle" style="color:var(--teal); animation-delay:0s;"></div></div></div>
+      <div class="box accent-teal col-side">
+        <div class="box-title"><span class="icon-circle">📦</span>Batch of Quote PDFs</div>
+        <div class="file-row">
+          <div class="file-chip"><span class="ficon">📄</span>Quote A</div>
+          <div class="file-chip"><span class="ficon">📄</span>Quote B</div>
+          <div class="file-chip"><span class="ficon">📄</span>Quote C</div>
+          <div class="file-chip"><span class="ficon">📄</span>...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 5 -->
+  <div class="stage" data-stage="5">
+    <div class="stage-head">
+      <div class="stage-num">05</div>
+      <div class="stage-titles">
+        <h2>Batch Intelligence — Risk Agent Analysis</h2>
+        <p>A multimodal LLM ingests every carrier quote PDF and evaluates pricing against clinical and demographic risk.</p>
+      </div>
+      <div class="status-pill"><span class="blip" style="background:var(--violet); box-shadow:0 0 8px var(--violet);"></span>Multimodal LLM</div>
+    </div>
+    <div class="stage-body">
+      <div class="box accent-violet col-main">
+        <div class="box-title"><span class="icon-circle">🧠</span>Risk Agent (Multimodal LLM)</div>
+        <ul>
+          <li>Ingest all carrier quote PDFs directly</li>
+          <li>Evaluate pricing vs. clinical risk signals</li>
+          <li>Score risk &amp; confidence per carrier</li>
+          <li>Provide clinical reasoning narrative</li>
+        </ul>
+      </div>
+      <div class="conn"><div class="conn-line"><div class="particle" style="color:var(--violet); animation-delay:0.3s;"></div></div></div>
+      <div class="box accent-amber col-side" style="justify-content:center;">
+        <div class="box-title"><span class="icon-circle">{ }</span>Risk Evaluation Output</div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-dim); background:rgba(0,0,0,0.25); border-radius:8px; padding:12px; line-height:1.6;">
+          [ { "carrier": "A",<br>&nbsp;&nbsp;&nbsp;"risk_score": 0.82,<br>&nbsp;&nbsp;&nbsp;"confidence": "high" }, ... ]
+        </div>
+        <div class="output-tag"><div class="output-value" style="color:var(--amber);">Risk Evaluation JSON Array</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 6 -->
+  <div class="stage" data-stage="6">
+    <div class="stage-head">
+      <div class="stage-num">06</div>
+      <div class="stage-titles">
+        <h2>Deterministic Guardrails &amp; Auto-Tagging</h2>
+        <p>A rules engine applies hard, non-negotiable guardrails on top of the AI score and assigns a review status.</p>
+      </div>
+      <div class="status-pill"><span class="blip" style="background:var(--green); box-shadow:0 0 8px var(--green);"></span>Rules Engine</div>
+    </div>
+    <div class="stage-body">
+      <div class="box accent-green col-main">
+        <div class="box-title"><span class="icon-circle">✅</span>Business Rules Engine</div>
+        <ul>
+          <li>Premium threshold check ( &gt; $1,000,000 )</li>
+          <li>NAICS industry blacklist check</li>
+          <li>Risk score threshold evaluation</li>
+          <li>Policy violation checks</li>
+        </ul>
+      </div>
+      <div class="conn"><div class="conn-line"><div class="particle" style="color:var(--teal); animation-delay:0.1s;"></div></div></div>
+      <div class="box accent-teal col-side" style="justify-content:center;">
+        <div class="box-title"><span class="icon-circle">📋</span>Output</div>
+        <div class="output-value" style="font-size:15px;">Master Dataset</div>
+        <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">with Review Status flags attached to every quote</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 7 -->
+  <div class="stage" data-stage="7">
+    <div class="stage-head">
+      <div class="stage-num">07</div>
+      <div class="stage-titles">
+        <h2>Supervisory UI</h2>
+        <p>The workflow suspends in UiPath Maestro and a structured task is created for human underwriter review.</p>
+      </div>
+      <div class="status-pill"><span class="blip" style="background:var(--amber); box-shadow:0 0 8px var(--amber);"></span>Awaiting Human Input</div>
+    </div>
+    <div class="stage-body">
+      <div class="box accent-orange col-main">
+        <div class="box-title"><span class="icon-circle">🗂️</span>Action Center / App</div>
+        <ul>
+          <li>Create underwriter task in queue</li>
+          <li>Push master dataset to reviewer UI</li>
+          <li>Notify assigned underwriter</li>
+          <li>Apply SLA timers &amp; escalation rules</li>
+        </ul>
+      </div>
+      <div class="conn"><div class="conn-line"><div class="particle" style="color:var(--amber); animation-delay:0.2s;"></div></div></div>
+      <div class="box accent-amber col-side" style="justify-content:center; align-items:center; text-align:center;">
+        <div style="font-size:34px;">👤</div>
+        <div class="output-value" style="margin-top:8px;">Human Task Created</div>
+        <div style="font-size:12px; color:var(--text-dim); margin-top:4px;">Review Queue</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 8 -->
+  <div class="stage" data-stage="8">
+    <div class="stage-head">
+      <div class="stage-num">08</div>
+      <div class="stage-titles">
+        <h2>Underwriter Human-in-the-Loop Validation</h2>
+        <p>The underwriter reviews AI reasoning, overrides where needed, and finalizes disposition on every item.</p>
+      </div>
+      <div class="status-pill"><span class="blip" style="background:var(--amber); box-shadow:0 0 8px var(--amber);"></span>Human Decision</div>
+    </div>
+    <div class="stage-body" style="flex-direction:column; justify-content:center;">
+      <div class="row-split" style="max-width:1000px; margin:0 auto; width:100%;">
+        <div class="box accent-green" style="padding:30px 32px;">
+          <div class="box-title" style="font-size:18px;"><span class="icon-circle" style="width:36px;height:36px;font-size:20px;">🙋</span>Auto-Recommended <span style="color:var(--text-faint); font-weight:600; font-size:13px;">(Low Risk)</span></div>
+          <ul style="gap:16px;">
+            <li>Review &amp; verify AI reasoning</li>
+            <li>Bulk accept eligible items in one click</li>
+          </ul>
+          <div class="verdict-row" style="margin-top:18px;">
+            <div class="verdict ok">✓ Bulk Accept All</div>
+          </div>
+        </div>
+        <div class="box" style="border-color:rgba(255,84,112,0.4); padding:30px 32px;">
+          <div class="box-title" style="color:var(--red); font-size:18px;"><span class="icon-circle" style="width:36px;height:36px;font-size:20px;">🚩</span>Flagged <span style="color:var(--text-faint); font-weight:600; font-size:13px;">(High Risk / Exceptions)</span></div>
+          <ul style="gap:16px;">
+            <li>Review AI reasoning in detail</li>
+            <li>Override &amp; accept, or reject &amp; discard</li>
+          </ul>
+          <div class="verdict-row" style="margin-top:18px;">
+            <div class="verdict ok" style="flex:none; padding:9px 16px;">✓ Accept</div>
+            <div class="verdict flag" style="flex:none; padding:9px 16px;">✕ Reject</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:center; margin-top:26px;">
+        <div class="verdict ok" style="flex:none; padding:13px 28px; font-size:13px;">🔒 All items must be dispositioned before proceeding</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 9 -->
+  <div class="stage" data-stage="9">
+    <div class="stage-head">
+      <div class="stage-num">09</div>
+      <div class="stage-titles">
+        <h2>Curated Pool — Consolidation Agent</h2>
+        <p>Approved quotes are consolidated and an executive-ready broker proposal is generated automatically.</p>
+      </div>
+      <div class="status-pill"><span class="blip" style="background:var(--violet); box-shadow:0 0 8px var(--violet);"></span>LLM Generation</div>
+    </div>
+    <div class="stage-body">
+      <div class="box accent-violet col-main">
+        <div class="box-title"><span class="icon-circle">🧠</span>Proposal Agent (LLM)</div>
+        <ul>
+          <li>Synthesize all approved quotes</li>
+          <li>Write executive summary narrative</li>
+          <li>Build market comparison table</li>
+          <li>Generate pros &amp; cons, final proposal PDF</li>
+        </ul>
+      </div>
+      <div class="conn"><div class="conn-line"><div class="particle" style="color:var(--violet); animation-delay:0.15s;"></div></div></div>
+      <div class="box accent-teal col-side" style="align-items:center; justify-content:center; text-align:center;">
+        <div style="font-size:34px;">📄</div>
+        <div class="output-value" style="margin-top:8px;">Consolidated Proposal PDF</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STAGE 10 -->
+  <div class="stage" data-stage="10">
+    <div class="stage-head">
+      <div class="stage-num">10</div>
+      <div class="stage-titles">
+        <h2>Automated Output Delivery &amp; Compliance Logging</h2>
+        <p>The final proposal is delivered to the broker and a full immutable audit trail is recorded for compliance.</p>
+      </div>
+      <div class="status-pill"><span class="blip"></span>Pipeline Complete</div>
+    </div>
+    <div class="stage-body" style="flex:0 0 auto;">
+      <div class="box accent-orange" style="flex:1;">
+        <div class="box-title"><span class="icon-circle">🤖</span>UiPath Robot</div>
+        <ul>
+          <li>Generate broker-facing email</li>
+          <li>Attach final proposal PDF</li>
+          <li>Send to retail broker</li>
+        </ul>
+      </div>
+      <div class="conn"><div class="conn-line"><div class="particle" style="color:var(--orange); animation-delay:0s;"></div></div></div>
+      <div class="box accent-teal" style="flex:1;">
+        <div class="box-title"><span class="icon-circle">📨</span>Broker</div>
+        <ul>
+          <li>Receives consolidated proposal</li>
+          <li>End of automated process</li>
+        </ul>
+      </div>
+      <div class="conn"><div class="conn-line"><div class="particle" style="color:var(--teal); animation-delay:0.4s;"></div></div></div>
+      <div class="box accent-green" style="flex:1;">
+        <div class="box-title"><span class="icon-circle">🛡️</span>Audit &amp; Logging</div>
+        <ul>
+          <li>Full transaction log</li>
+          <li>Approvals / overrides captured</li>
+          <li>LLM reasoning + full audit trail</li>
+        </ul>
+      </div>
+    </div>
+    <div style="flex:0 0 24px;"></div>
+    <div style="text-align:center;">
+      <div class="mono" style="font-size:11px; letter-spacing:3px; color:var(--text-faint); font-weight:700; margin-bottom:14px;">— OUTCOME —</div>
+    </div>
+    <div class="outcome-banner" style="margin-top:0;">
+      <div class="outcome-chip"><span class="dotc"></span>Faster Turnaround</div>
+      <div class="outcome-chip"><span class="dotc"></span>AI-Powered Risk Insights</div>
+      <div class="outcome-chip"><span class="dotc"></span>Human Governance</div>
+      <div class="outcome-chip"><span class="dotc"></span>Compliance by Design</div>
+      <div class="outcome-chip"><span class="dotc"></span>Zero Manual File Parsing</div>
+      <div class="outcome-chip"><span class="dotc"></span>100% Data Integrity</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- NAV BUTTONS (outside click-zone so they don't double-trigger) -->
+<div class="nav-btn" id="prevBtn" title="Previous step">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+</div>
+<div class="nav-btn" id="nextBtn" title="Next step">
+  <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</div>
+
+
+<!-- RIGHT SIDE RAIL (persistent governance panel) -->
+<div class="side-col" style="position:absolute; top:122px; right:0; bottom:64px; width:262px;">
+  <div class="side-title" style="color:var(--violet);" id="railTitle">DATA &amp; STORAGE LAYER</div>
+  <div class="side-box" id="rail-1"><span class="sicon">🗄️</span><span class="side-box-text">Storage Bucket<br></span></div>
+  <div class="side-box" id="rail-2"><span class="sicon">📚</span><span class="side-box-text">Data Fabric<br></span></div>
+  <div class="side-box" id="rail-3"><span class="sicon">📜</span><span class="side-box-text">Audit &amp; Log Store<br>(Immutable Logs)</span></div>
+
+  <div style="height:14px;"></div>
+  <div class="side-title" style="color:var(--green);">CONTROLS &amp; GOVERNANCE</div>
+  <div class="side-box" id="rail-4"><span class="sicon">🛡️</span><span class="side-box-text">Business Rules &amp; Guardrails</span></div>
+  <div class="side-box" id="rail-5"><span class="sicon">📖</span><span class="side-box-text">Policy &amp; Risk Libraries</span></div>
+  <div class="side-box" id="rail-6"><span class="sicon">🔐</span><span class="side-box-text">Access Control &amp; RBAC</span></div>
+  <div class="side-box" id="rail-7"><span class="sicon">🧾</span><span class="side-box-text">Audit, Logging &amp; Traceability</span></div>
+  <div class="side-box" id="rail-8"><span class="sicon">✔️</span><span class="side-box-text">Compliance (HIPAA, SOC2)</span></div>
+
+  
+</div>
+
+<!-- TIMELINE -->
+<div class="timeline" id="timeline"></div>
+
+<script>
+  const steps = [
+    "Trigger & Ingestion","Structured Extraction","Parallel Orchestration","Raw Batch Assembly",
+    "Risk Agent Analysis","Guardrails & Tagging","Supervisory Suspension","Underwriter HITL",
+    "Consolidation Agent","Delivery & Audit"
+  ];
+  // map which rail items light up at which stage
+  const railMap = {
+    1:[1], 2:[1,2], 3:[1], 4:[1], 5:[2,5], 6:[4,5,8], 7:[1,6,7,8], 8:[1,2,6,7,8], 9:[1,2], 10:[1,3,7]
+  };
+
+  const tlEl = document.getElementById('timeline');
+  steps.forEach((s,i)=>{
+    const d = document.createElement('div');
+    d.className='tl-step';
+    d.id = 'tl-'+(i+1);
+    d.innerHTML = `<div class="tl-bar"></div><div class="tl-dot"></div><div class="tl-label">${s}</div>`;
+    tlEl.appendChild(d);
+  });
+
+  let current = 1;
+  const total = 10;
+
+  function render(){
+    document.querySelectorAll('.stage').forEach(s=>{
+      s.classList.toggle('active', parseInt(s.dataset.stage)===current);
+    });
+    document.getElementById('progressBar').style.width = (current/total*100)+'%';
+    for(let i=1;i<=total;i++){
+      const t = document.getElementById('tl-'+i);
+      t.classList.remove('done','current');
+      if(i<current) t.classList.add('done');
+      if(i===current) t.classList.add('current');
+    }
+    // rail lighting
+    document.querySelectorAll('.side-box').forEach(b=>b.classList.remove('lit'));
+    (railMap[current]||[]).forEach(n=>{
+      const el = document.getElementById('rail-'+n);
+      if(el) el.classList.add('lit');
+    });
+    // nav button states
+    document.getElementById('prevBtn').classList.toggle('disabled', current<=1);
+    document.getElementById('nextBtn').classList.toggle('disabled', current>=total);
+    document.getElementById('nextBtn').classList.toggle('finished', current>=total);
+  }
+
+  function goNext(){ if(current<total){ current++; render(); } }
+  function goPrev(){ if(current>1){ current--; render(); } }
+
+  render();
+
+  // click-through on timeline dots
+  document.querySelectorAll('.tl-step').forEach((el,i)=>{
+    el.style.cursor='pointer';
+    el.addEventListener('click', ()=>{ current = i+1; render(); });
+  });
+
+  // nav buttons
+  document.getElementById('nextBtn').addEventListener('click', goNext);
+  document.getElementById('prevBtn').addEventListener('click', goPrev);
+
+  // click anywhere on main stage area (not on interactive bits) to advance
+  document.getElementById('clickZone').addEventListener('click', goNext);
+
+  // keyboard nav
+  document.addEventListener('keydown', (e)=>{
+    if(e.key==='ArrowRight' || e.key===' '){ e.preventDefault(); goNext(); }
+    if(e.key==='ArrowLeft'){ goPrev(); }
+  });
+</script>
+
+</body>
+</html>

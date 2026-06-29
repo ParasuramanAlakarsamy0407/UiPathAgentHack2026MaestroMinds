@@ -7,7 +7,7 @@ from googleapiclient.http import MediaFileUpload
 import os
 import json
 from pydantic import BaseModel
-from weasyprint import HTML
+from playwright.sync_api import sync_playwright
 
 class HtmlToPdfRequest(BaseModel):
     html_content: str
@@ -164,6 +164,7 @@ def debug_token():
     }
 
 
+
 @app.post("/html-to-pdf")
 async def html_to_pdf(request: HtmlToPdfRequest):
 
@@ -190,24 +191,28 @@ async def html_to_pdf(request: HtmlToPdfRequest):
             file_name
         )
 
-       from playwright.sync_api import sync_playwright
-
-    def html_to_pdf(html, output_path):
         with sync_playwright() as p:
-            browser = p.chromium.launch()
+
+            browser = p.chromium.launch(headless=True)
+
             page = browser.new_page()
 
-            page.set_content(html, wait_until="networkidle")
-    
+            page.set_content(
+                request.html_content,
+                wait_until="load"
+            )
+
             page.pdf(
                 path=output_path,
                 format="A4",
                 print_background=True,
+                display_header_footer=False,
+                prefer_css_page_size=True,
                 margin={
-                    "top": "15mm",
-                    "right": "15mm",
-                    "bottom": "15mm",
-                    "left": "15mm"
+                    "top":"15mm",
+                    "right":"15mm",
+                    "bottom":"15mm",
+                    "left":"15mm"
                 }
             )
 
@@ -219,16 +224,14 @@ async def html_to_pdf(request: HtmlToPdfRequest):
         )
 
         return {
-            "status": "success",
-            "file_name": file_name,
-            "file_url": file_url
+            "status":"success",
+            "file_name":file_name,
+            "file_url":file_url
         }
 
     except Exception as ex:
 
         return {
-            "status": "failed",
-            "error": str(ex)
+            "status":"failed",
+            "error":str(ex)
         }
-
-

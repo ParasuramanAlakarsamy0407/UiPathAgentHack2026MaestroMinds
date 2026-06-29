@@ -72,7 +72,7 @@ These agents work alongside a **deterministic Business Rules Engine** (hard guar
 
 > A full animated walkthrough of this architecture is included in the repo: 
 
-(https://github.com/ParasuramanAlakarsamy0407/UiPathAgentHack2026MaestroMinds/blob/main/OmniQuoteAI\_\_Animated\_ArchitectureFlow.html) — open it in any browser and use the arrow keys / nav buttons to step through.
+(https://github.com/ParasuramanAlakarsamy0407/UiPathAgentHack2026MaestroMinds/blob/main/OmniQuoteAI__Animated_ArchitectureFlow/OmniQuoteAI__Animated_ArchitectureFlow.html) — open it in any browser and use the arrow keys / nav buttons to step through.
 
 
 

@@ -190,7 +190,28 @@ async def html_to_pdf(request: HtmlToPdfRequest):
             file_name
         )
 
-        HTML(string=request.html_content).write_pdf(output_path)
+       from playwright.sync_api import sync_playwright
+
+    def html_to_pdf(html, output_path):
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+
+            page.set_content(html, wait_until="networkidle")
+    
+            page.pdf(
+                path=output_path,
+                format="A4",
+                print_background=True,
+                margin={
+                    "top": "15mm",
+                    "right": "15mm",
+                    "bottom": "15mm",
+                    "left": "15mm"
+                }
+            )
+
+            browser.close()
 
         file_url = upload_to_google_drive(
             output_path,

@@ -7,7 +7,12 @@ from googleapiclient.http import MediaFileUpload
 import pickle
 import os
 import json
+from pydantic import BaseModel
+from weasyprint import HTML
 
+class HtmlToPdfRequest(BaseModel):
+    html_content: str
+    output_file_name: str | None = None
 app = FastAPI(
     title="AgentHack Document Generator",
     version="1.0"
@@ -45,10 +50,48 @@ def upload_to_google_drive(file_path: str):
         "parents": [GOOGLE_DRIVE_FOLDER_ID]
     }
 
+def upload_to_google_drive(file_path: str, mime_type: str):
+
+    creds = Credentials.from_authorized_user_file(
+        TOKEN_FILE,
+        ["https://www.googleapis.com/auth/drive.file"]
+    )
+
+    service = build(
+        "drive",
+        "v3",
+        credentials=creds
+    )
+
+    file_name = os.path.basename(file_path)
+
+    file_metadata = {
+        "name": file_name,
+        "parents": [GOOGLE_DRIVE_FOLDER_ID]
+    }
+
     media = MediaFileUpload(
         file_path,
-        mimetype="application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        mimetype=mime_type
     )
+
+    uploaded_file = service.files().create(
+        body=file_metadata,
+        media_body=media,
+        fields="id,name"
+    ).execute()
+
+    file_id = uploaded_file["id"]
+
+    service.permissions().create(
+        fileId=file_id,
+        body={
+            "type": "anyone",
+            "role": "reader"
+        }
+    ).execute()
+
+    return f"https://drive.google.com/file/d/{file_id}/view"
 
     uploaded_file = service.files().create(
         body=file_metadata,
@@ -124,7 +167,10 @@ async def generate_document(payload: Dict[str, Any]):
 
         doc.save(output_path)
 
-        file_url = upload_to_google_drive(output_path)
+        file_url = upload_to_google_drive(
+    output_path,
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+)
 
         return {
             "status": "success",
@@ -156,5 +202,52 @@ def debug_token():
         "exists": True,
         "first_bytes": str(first_20_bytes)
     }
+
+
+@app.post("/html-to-pdf")
+async def html_to_pdf(request: HtmlToPdfRequest):
+
+    try:
+
+        if not GOOGLE_DRIVE_FOLDER_ID:
+            raise Exception(
+                "GOOGLE_DRIVE_FOLDER_ID environment variable not configured"
+            )
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        file_name = (
+            request.output_file_name
+            if request.output_file_name
+            else f"HTML_{timestamp}.pdf"
+        )
+
+        if not file_name.lower().endswith(".pdf"):
+            file_name += ".pdf"
+
+        output_path = os.path.join(
+            OUTPUT_FOLDER,
+            file_name
+        )
+
+        HTML(string=request.html_content).write_pdf(output_path)
+
+        file_url = upload_to_google_drive(
+            output_path,
+            "application/pdf"
+        )
+
+        return {
+            "status": "success",
+            "file_name": file_name,
+            "file_url": file_url
+        }
+
+    except Exception as ex:
+
+        return {
+            "status": "failed",
+            "error": str(ex)
+        }
 
 

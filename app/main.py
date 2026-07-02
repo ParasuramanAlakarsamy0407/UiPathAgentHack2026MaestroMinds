@@ -25,7 +25,6 @@ TOKEN_FILE = "/etc/secrets/token.json"
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
-
 from google.oauth2.credentials import Credentials
 
 def upload_to_google_drive(file_path: str, mime_type: str):
